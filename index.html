@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>PDN</title>
+  <meta name="description" content="">
+  <meta name="author" content="Sergio Rodríguez">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="css/bubble_chart.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<body>
+  <nav class="navbar bg-body-tertiary"
+    style="background: transparent linear-gradient(230deg, #1C7CBF 0%, #1C7CBF 4%, #9F58E2 49%, #6D4061 100%) 0% 0% !important; z-index: 10;">
+    <div class="container-fluid" style="max-width: 1500px !important">
+      <a class="navbar-brand" href="https://www.plataformadigitalnacional.org/">
+        <img src="./iconos/logo_pdn-transparente.svg" alt="Logo" height="32" class="d-inline-block align-text-top">
+      </a>
+    </div>
+  </nav>
+  <div class="container">
+
+    <div class="container mt-3 mb-5" style="max-width: 1500px !important">
+      <div class="row text-center mx-auto">
+        <div class="col-12">
+          <h1 style="text-align: center;">Empresas con representación de servidores públicos</h1>
+          <!-- <div id="toolbar">
+            <a href="#" id="all" class="button active">Todo</a>
+            <a href="#" id="year" class="button">Tipo de Representación</a>
+          </div> -->
+          <div id="vis"></div>
+
+        </div>
+        <div class="w-50 mx-auto">
+          <div class='my-legend'>
+            <div class='legend-title'>Tipo de representación del servidor público</div>
+            <div class='legend-scale'>
+              <ul class='legend-labels'>
+                <li><span style='background:#F1948A; text-align: "left";'></span>Accionista</li>
+                <li><span style='background:#BB8FCE;'></span>Apoderado</li>
+                <li><span style='background:#7FB3D5;'></span>Colborador</li>
+                <li><span style='background:#73C6B6;'></span>Empleado</li>
+                <li><span style='background:#F9E79F;'></span>Representante</li>
+                <li><span style='background:#E59866;'></span>Socio</li>
+              </ul>
+            </div>
+            <!-- <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
+            </div> -->
+          </div>
+        </div>
+        <!-- <div class="footer">
+        <strong>Plataforma Digital Nacional</strong>
+      </div> -->
+      </div>
+
+
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="mapaInfo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div id="modalTitulo"><h3>Información</h3></div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="divServidor">
+              <!-- generar este bloque y poner titulo como nombre de la persona y en eltexto mostrar los datos de la persona -->
+            </div>
+            <div class="accordion accordion-flush" id="accordionFlush"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="src/tooltip.js"></script>
+    <script src="src/bubble_chart.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"
+      integrity="sha512-WW8/jxkELe2CAiE4LvQfwm1rajOS8PHasCCx+knHG0gBHt8EXxS6T6tJRTGuDQVnluuAvMxWF4j8SNFDKceLFg=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+</body>
+
+</html>
