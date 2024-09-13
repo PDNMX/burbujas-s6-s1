@@ -65,7 +65,7 @@ function bubbleChart() {
   // @v4 Before the charge was a stand-alone attribute
   //  of the force layout. Now we can use it as a separate force!
   function charge(d) {
-    return -Math.pow(d.radius, 2.0) * forceStrength;
+    return -Math.pow(d.radius, 2.05) * forceStrength;
   }
 
   // Here we create a force layout and
@@ -113,15 +113,15 @@ function bubbleChart() {
     // Use the max total_amount in the data as the max in the scale's domain
     // note we have to ensure the total_amount is a number.
     var maxAmount = d3.max(rawData, function (d) {
-      return +d.servidor_publico.participacion[0].porcentajeParticipacion;
+      return +d.porcentajeParticipacion;
     });
 
     // Sizes bubbles based on area.
     // @v4: new flattened scale names.
     var radiusScale = d3
       .scalePow()
-      .exponent(0.5)
-      .range([10, 60])
+      .exponent(20)
+      .range([10, 50])
       .domain([0, maxAmount]);
 
     // Use map() to convert raw data into node data.
@@ -131,18 +131,18 @@ function bubbleChart() {
       return {
         radius: radiusScale(
           parseInt(
-            +d.servidor_publico.participacion[0].porcentajeParticipacion,
+            +d.porcentajeParticipacion,
           ),
         ),
         porcentaje_participacion:
-          +d.servidor_publico.participacion[0].porcentajeParticipacion,
+          +d.porcentajeParticipacion,
         nombre_empresa:
-          d.servidor_publico.participacion[0].nombreEmpresaSociedadAsociacion,
+          d.nombreEmpresaSociedadAsociacion,
         tipo_participacion:
-          d.servidor_publico.participacion[0].tipoParticipacion.valor,
-        rfc: d.servidor_publico.participacion[0].rfc,
-        participacion_declarante: d.servidor_publico.datosGenerales.nombre,
-        contrataciones: d.contrataciones,
+          d.tipoParticipacion,
+        rfc: d.rfc,
+        participacion_declarante: d.nombre + ' ' + d.primerApellido + ' ' + d.segundoApellido,
+        contrataciones: d.sistema6_data,
         x: Math.random() * 900,
         y: Math.random() * 800,
       };
@@ -239,7 +239,7 @@ function bubbleChart() {
                     <div class="accordion-body">
                       <ul>
                         <li><strong>Nombre de la contración: </strong>
-                          ${contrato.titulo}
+                          ${contrato.tender.title}
                         </li>
                       </ul>
                     </div>
@@ -461,7 +461,7 @@ function setupButtons() {
  */
 
 // Load the data.
-d3.json("data/data2.json", display);
+d3.json("data/data.json", display);
 
 // setup the buttons.
 setupButtons();
