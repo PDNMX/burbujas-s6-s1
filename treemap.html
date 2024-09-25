@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treemap con Títulos de Licitaciones</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3plus@2"></script>
+    <style>
+        #chart {
+            width: 100%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Empresas con representación de servidores públicos</h1>
+    <div id="chart"></div>
+
+    <script>
+        // Función para transformar los datos
+        function transformarDatos(data) {
+            return data.map(persona => ({
+                empresa: persona.nombreEmpresaSociedadAsociacion, // Primer nivel: Nombre de la empresa
+                value: persona.sistema6_data.length, // Tamaño basado en el número de elementos en sistema6_data
+                children: persona.sistema6_data.map(sistema => ({
+                    empresa: persona.nombreEmpresaSociedadAsociacion, // Mostrar el nombre de la empresa en cada licitación
+                    tenderTitle: sistema.tender.title, // Usamos el título para los datos internos
+                    value: 1 // Valor fijo para cada licitación
+                }))
+            }));
+        }
+
+        // Cargar datos desde el archivo JSON
+        fetch('data/data.json')
+            .then(response => response.json())
+            .then(data => {
+                // Transformar los datos para el treemap
+                const transformedData = transformarDatos(data);
+
+                // Crear el gráfico de treemap con drill down
+                const visualization = new d3plus.Treemap()
+                    .data(transformedData)
+                    .groupBy(["empresa", "tenderTitle"]) // Nivel 1: Empresa, Nivel 2: Tender titles (sin quitar repetidos)
+                    .sum("value") // Determina el tamaño de cada bloque
+                    .select("#chart")
+                    .label(function(d) {
+                        // Mostrar nombre de la empresa en el primer nivel, y el título de la licitación en los siguientes niveles
+                        return d["tenderTitle"] ? d["tenderTitle"] : d["empresa"];
+                    })
+                    .on("click", function(d) {
+                        // Verificar si tiene hijos
+                        if (d.children && d.children.length > 0) {
+                            // Mostrar el siguiente nivel
+                            visualization.config({ data: d.children }).render();
+                        } else {
+                            // Volver al nivel superior
+                            visualization.config({ data: transformedData }).render();
+                        }
+                    })
+                    .render();
+            })
+            .catch(error => console.error('Error al cargar los datos:', error));
+    </script>
+</body>
+</html>
