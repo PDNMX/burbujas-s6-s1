@@ -9,4 +9,4 @@ RUN npm i -g serve
 
 EXPOSE 5000
 
-CMD ["serve", "-s", "/burbujas", "-l", "5000"]
+CMD ["serve", "/burbujas", "-l", "5000"]
