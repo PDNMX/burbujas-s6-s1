@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1 style="text-align: center;">Empresas con representación de servidores públicos</h1>
     <div id="chart"></div>
@@ -20,10 +22,10 @@
         // Función para transformar los datos
         function transformarDatos(data) {
             return data.map(persona => ({
-                empresa: persona.nombreEmpresaSociedadAsociacion, // Primer nivel: Nombre de la empresa
+                empresa: persona.participacion.nombreEmpresaSociedadAsociacion, // Primer nivel: Nombre de la empresa
                 value: persona.sistema6_data.length, // Tamaño basado en el número de elementos en sistema6_data
                 children: persona.sistema6_data.map(sistema => ({
-                    empresa: persona.nombreEmpresaSociedadAsociacion, // Mostrar el nombre de la empresa en cada licitación
+                    empresa: persona.participacion.nombreEmpresaSociedadAsociacion, // Mostrar el nombre de la empresa en cada licitación
                     tenderTitle: sistema.tender.title, // Usamos el título para los datos internos
                     value: 1 // Valor fijo para cada licitación
                 }))
@@ -31,23 +33,112 @@
         }
 
         // Cargar datos desde el archivo JSON
-        fetch('data/data.json')
+        fetch('data/data3.json')
             .then(response => response.json())
             .then(data => {
                 // Transformar los datos para el treemap
-                const transformedData = transformarDatos(data);
+                const transformedData = data.map((persona, personaIndex) => ({
+                    empresa: persona.participacion.nombreEmpresaSociedadAsociacion, // Primer nivel: Nombre de la empresa
+                    participacion: persona.participacion,
+                    datosGenerales: persona.datosGenerales,
+                    datosEmpleoCargoComision: persona.datosEmpleoCargoComision,
+                    value: persona.sistema6_data.length, // Tamaño basado en el número de elementos en sistema6_data
+                    children: persona.sistema6_data.map((sistema, sistemaIndex) => ({
+                        id: sistemaIndex, // ID único basado en el índice
+                        empresa: persona.participacion.nombreEmpresaSociedadAsociacion, // Mostrar el nombre de la empresa en cada licitación
+                        tenderTitle: sistema.tender.title, // Usamos el título para los datos internos
+                        tenderFecha: sistema.tender.fecha, // Fecha de la licitación
+                        tenderMonto: sistema.tender.monto, // Monto de la licitación
+                        supplier: sistema.supplier, // Proveedor
+                        awards: sistema.awards, // Premios
+                        buyer: sistema.buyer, // Comprador
+                        tender: sistema.tender,
+                        value: 1 // Valor fijo para cada licitación
+                    }))
+                }));
 
                 // Crear el gráfico de treemap con drill down
                 const visualization = new d3plus.Treemap()
                     .data(transformedData)
-                    .groupBy(["empresa", "tenderTitle"]) // Nivel 1: Empresa, Nivel 2: Tender titles (sin quitar repetidos)
+                    .groupBy(["empresa", "id"]) // Grupo por empresa y un ID único para no agrupar licitaciones
                     .sum("value") // Determina el tamaño de cada bloque
                     .select("#chart")
-                    .label(function(d) {
+                    .label(function (d) {
                         // Mostrar nombre de la empresa en el primer nivel, y el título de la licitación en los siguientes niveles
                         return d["tenderTitle"] ? d["tenderTitle"] : d["empresa"];
                     })
-                    .on("click", function(d) {
+                    .tooltipConfig({
+                        title: function (d) {
+                            return d["empresa"] || "Empresa no disponible"; // Título principal: nombre de la empresa
+                        },
+                        tbody: function (d) {
+                            if (d["children"] && d["children"].length > 0) {
+                                const participacion = d["participacion"] || {};
+                                const datosGenerales = d["datosGenerales"] || {};
+                                const datosEmpleoCargoComision = d["datosEmpleoCargoComision"] || {};
+
+                                // Si hay children disponibles, mostramos información de la licitación
+                                return [
+                                    ["Número de Licitaciones", d["value"] || "No disponible"],
+                                    ["Nombre de la Empresa", participacion.nombreEmpresaSociedadAsociacion || "No disponible"],
+                                    ["RFC", participacion.rfc || "No disponible"],
+                                    ["Tipo de Operación", participacion.tipoOperacion || "No disponible"],
+                                    ["Tipo de Relación", participacion.tipoRelacion || "No disponible"],
+                                    ["Porcentaje de Participación", participacion.porcentajeParticipacion !== undefined ? `${participacion.porcentajeParticipacion}%` : "No disponible"],
+                                    ["Tipo de Participación", participacion.tipoParticipacion ? participacion.tipoParticipacion.valor || "No disponible" : "No disponible"],
+                                    ["Recibe Remuneración", participacion.recibeRemuneracion ? "Sí" : "No"],
+                                    ["Monto Mensual", participacion.montoMensual ? `$${participacion.montoMensual.valor.toLocaleString()} ${participacion.montoMensual.moneda || "No disponible"}` : "No disponible"],
+                                    ["Ubicación", participacion.ubicacion ? `${participacion.ubicacion.entidadFederativa.valor || "No disponible"}, ${participacion.ubicacion.pais || "No disponible"}` : "No disponible"],
+                                    ["Sector", participacion.sector ? participacion.sector.valor || "No disponible" : "No disponible"],
+                                    ["Nombre", datosGenerales.nombre || "No disponible"],
+                                    ["Primer Apellido", datosGenerales.primerApellido || "No disponible"],
+                                    ["Segundo Apellido", datosGenerales.segundoApellido || "No disponible"],
+                                    ["Correo Electrónico", datosGenerales.correoElectronico ? datosGenerales.correoElectronico.institucional || "No disponible" : "No disponible"],
+                                    ["Nivel de Orden de Gobierno", datosEmpleoCargoComision.nivelOrdenGobierno || "No disponible"],
+                                    ["Ámbito Público", datosEmpleoCargoComision.ambitoPublico || "No disponible"],
+                                    ["Nombre del Ente Público", datosEmpleoCargoComision.nombreEntePublico || "No disponible"],
+                                    ["Área de Adscripción", datosEmpleoCargoComision.areaAdscripcion || "No disponible"],
+                                    ["Empleo/Cargo/Comisión", datosEmpleoCargoComision.empleoCargoComision || "No disponible"],
+                                    ["Contratado por Honorarios", datosEmpleoCargoComision.contratadoPorHonorarios ? "Sí" : "No"],
+                                    ["Nivel de Empleo/Cargo/Comisión", datosEmpleoCargoComision.nivelEmpleoCargoComision || "No disponible"],
+                                    ["Función Principal", datosEmpleoCargoComision.funcionPrincipal || "No disponible"],
+                                    ["Fecha de Toma de Posesión", datosEmpleoCargoComision.fechaTomaPosesion || "No disponible"],
+                                    ["Teléfono de Oficina", datosEmpleoCargoComision.telefonoOficina ? `${datosEmpleoCargoComision.telefonoOficina.telefono || "No disponible"} ext. ${datosEmpleoCargoComision.telefonoOficina.extension || "No disponible"}` : "No disponible"],
+                                    ["Domicilio", datosEmpleoCargoComision.domicilioMexico ? `${datosEmpleoCargoComision.domicilioMexico.calle || "No disponible"} ${datosEmpleoCargoComision.domicilioMexico.numeroExterior || "S/N"} ${datosEmpleoCargoComision.domicilioMexico.coloniaLocalidad || "No disponible"}, ${datosEmpleoCargoComision.domicilioMexico.municipioAlcaldia ? datosEmpleoCargoComision.domicilioMexico.municipioAlcaldia.valor : "No disponible"}, ${datosEmpleoCargoComision.domicilioMexico.codigoPostal || "No disponible"}` : "No disponible"]
+                                ];
+                            } else {
+                                // Si no hay children, mostramos solo el nombre de la empresa
+
+
+                                const award = d.awards && d.awards.length > 0 ? d.awards[0] : {}; // Suponemos que tomamos el primer award
+                                const tender = d.tender || {}; // Tomamos el objeto tender
+                                return [
+                                    ["Título de Licitación", d.tenderTitle || "No disponible"],
+                                    ["Fecha de Licitación", d.tenderFecha || "No disponible"],
+                                    ["Monto", d.tenderMonto ? `$${d.tenderMonto.toLocaleString()} MXN` : "No disponible"],
+                                    ["Proveedor", d.supplier ? d.supplier.name || "No disponible" : "No disponible"],
+                                    ["Comprador", d.buyer ? d.buyer.name || "No disponible" : "No disponible"],
+                                    ["Descripción del Servicio", award.description || "No disponible"],
+                                    ["Estado del Contrato", award.status || "No disponible"],
+                                    ["Fecha de Inicio", award.contractPeriod ? award.contractPeriod.startDate || "No disponible" : "No disponible"],
+                                    ["Fecha de Finalización", award.contractPeriod ? award.contractPeriod.endDate || "No disponible" : "No disponible"],
+                                    ["Monto del Contrato", award.value ? `$${award.value.amount.toLocaleString()} ${award.value.currency || "No disponible"}` : "No disponible"],
+                                    ["Título de Licitación", d.tenderTitle || "No disponible"],
+                                    ["Descripción de la Licitación", tender.description || "No disponible"],
+                                    ["Fecha de Inicio de la Licitación", tender.tenderPeriod ? tender.tenderPeriod.startDate || "No disponible" : "No disponible"],
+                                    ["Fecha de Finalización de la Licitación", tender.awardPeriod ? tender.awardPeriod.endDate || "No disponible" : "No disponible"],
+                                    ["Método de Adquisición", tender.procurementMethod || "No disponible"],
+                                    ["Razonamiento del Método de Adquisición", tender.procurementMethodRationale || "No disponible"],
+                                    ["Comprador", tender.procuringEntity ? tender.procuringEntity.name || "No disponible" : "No disponible"],
+                                    ["Estado del Proceso", tender.status || "No disponible"],
+                                    ["Método de Presentación", (tender.submissionMethod && tender.submissionMethod.length > 0) ? tender.submissionMethod.join(", ") : "No disponible"],
+                                    ["Monto del Contrato", award.value ? `$${award.value.amount.toLocaleString()} ${award.value.currency || "No disponible"}` : "No disponible"],
+                                    ["Número de Licitaciones", d.value || "No disponible"] // Cambiamos d["value"] por d.value
+                                ];
+                            }
+                        }
+                    })
+                    .on("click", function (d) {
                         // Verificar si tiene hijos
                         if (d.children && d.children.length > 0) {
                             // Mostrar el siguiente nivel
@@ -62,4 +153,5 @@
             .catch(error => console.error('Error al cargar los datos:', error));
     </script>
 </body>
+
 </html>
