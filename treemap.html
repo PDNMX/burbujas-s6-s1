@@ -119,15 +119,26 @@
             var tipoParticipacion = participacion.tipoParticipacion || "No disponible";
             var sectorParticipacion = participacion.sectorParticipacion || "No disponible";
 
+            var empleoCargoComision = participacion.datosEmpleoCargoComision.empleoCargoComision || "No disponible";
+            var ente = participacion.datosEmpleoCargoComision.nombreEntePublico || "No disponible";
+            var fechaTomaPosesion = participacion.datosEmpleoCargoComision.fechaTomaPosesion || "No disponible";
+            var honorarios = participacion.datosEmpleoCargoComision.contratadoPorHonorarios !== undefined ? (participacion.datosEmpleoCargoComision.contratadoPorHonorarios ? 'Sí' : 'No') : "No disponible";
+
             // Crear el elemento <li> con saltos de línea y valores validados
             var li = document.createElement("li");
             li.innerHTML = `Nombre: ${nombre} ${primerApellido} ${segundoApellido}<br>
-                Empresa: ${nombreEmpresaParticipacion}<br>
-                RFC: ${rfcParticipacion}<br>
-                Porcentaje: ${porcentajeParticipacion}%<br>
-                Remuneración: ${recibeRemuneracion}<br>
-                Tipo: ${tipoParticipacion}<br>
-                Sector: ${sectorParticipacion}`;
+                Empresa con participación: ${nombreEmpresaParticipacion}<br>
+                RFC de la empresa con participación: ${rfcParticipacion}<br>
+                Porcentaje de participación: ${porcentajeParticipacion}%<br>
+                Remuneración en la participación: ${recibeRemuneracion}<br>
+                Tipo de participación: ${tipoParticipacion}<br>
+                Cargo: ${empleoCargoComision}<br>
+                Ente público: ${ente}<br>
+                Fecha de posesión: ${fechaTomaPosesion}<br>
+                Contratado por honorarios: ${honorarios}<br>
+                <br><br>
+                `;
+
             ul.appendChild(li);
         });
 
