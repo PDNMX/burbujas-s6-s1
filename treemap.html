@@ -13,6 +13,7 @@
             width: 100%;
             height: 600px;
         }
+
         #backButton {
             display: none;
             /* background-color: #713972;
@@ -70,9 +71,13 @@
                         tenderTitle: sistema.tender.title, // Usamos el título para los datos internos
                         buyer: sistema.buyer, // Comprador
                         tender: sistema.tender,
-                        value: 1 // Valor fijo para cada licitación
+                        value: 1, // Valor fijo para cada licitación
+                        isSupplier: sistema.parties && sistema.parties.some(party =>
+                            Array.isArray(party.roles) && party.roles.includes('supplier')
+                        )
                     }))
                 }));
+                console.log(transformedData)
                 const backButton = document.getElementById('backButton');
                 // Crear el gráfico de treemap con drill down
                 const visualization = new d3plus.Treemap()
@@ -81,15 +86,18 @@
                     .sum("value") // Determina el tamaño de cada bloque
                     .shapeConfig({
                         labelConfig: {
-                            fontMin: 10,
-                            fontMax: 20,
-                            padding: 5,
-                            // Cambiar el texto mostrado en los cuadros (quitar el porcentaje y poner el número de contratos o cualquier otro valor)
+                            // Cambiar el texto mostrado en los cuadros
                             text: function (d) {
                                 // Mostrar el nombre de la empresa en el primer nivel, o el título de la licitación en los niveles más bajos
-                                return d["children"] && d["children"].length > 0
+                                let label = d["children"] && d["children"].length > 0
                                     ? d["empresa"] + "\nParticipaciones: " + d["value"]
                                     : d["tenderTitle"];
+
+                                // Si es 'supplier', añadir la estrellita (★) al inicio
+                                if (d.isSupplier) {
+                                    label = "★\n" + label; // Colocar la estrella al inicio
+                                }
+                                return label;
                             }
                         }
                     })
@@ -97,6 +105,7 @@
                     .label(function (d) {
                         // Mostrar nombre de la empresa en el primer nivel, y el título de la licitación en los siguientes niveles
                         return d["tenderTitle"] ? d["tenderTitle"] : d["empresa"];
+
                     })
                     .tooltipConfig({
                         title: function (d) {
@@ -134,9 +143,10 @@
                             backButton.style.display = 'block'; // Mostrar el botón de regreso
                             // Mostrar el siguiente nivel
                             visualization.config({ data: d.children }).render();
-                            
+
                         } else {
                             // Volver al nivel superior
+                            backButton.style.display = 'none';
                             visualization.config({ data: transformedData }).render();
                         }
 
@@ -195,15 +205,15 @@
                         }
                     })
                     .render();
-                    // Añadir funcionalidad al botón de regreso
-                    backButton.addEventListener('click', function () {
-                        if (currentData) {
-                            // Volver al nivel padre
-                            visualization.config({ data: currentData }).render();
-                            backButton.style.display = 'none';  // Ocultar el botón de regreso
-                            document.getElementById("detalleParticipaciones").innerHTML = ""; // Limpiar la sección de detalles
-                        }
-                    });
+                // Añadir funcionalidad al botón de regreso
+                backButton.addEventListener('click', function () {
+                    if (currentData) {
+                        // Volver al nivel padre
+                        visualization.config({ data: currentData }).render();
+                        backButton.style.display = 'none';  // Ocultar el botón de regreso
+                        document.getElementById("detalleParticipaciones").innerHTML = ""; // Limpiar la sección de detalles
+                    }
+                });
             })
             .catch(error => console.error('Error al cargar los datos:', error));
     </script>
