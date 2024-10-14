@@ -1,6 +1,31 @@
 let currentData = null;
 let allData = null;
 
+const parentColors = [
+  "#1f77b4",
+  "#ff7f0e",
+  "#2ca02c",
+  "#d62728",
+  "#9467bd",
+  "#8c564b",
+  "#e377c2",
+  "#7f7f7f",
+  "#bcbd22",
+  "#17becf",
+];
+const childColors = [
+  "#aec7e8",
+  "#ffbb78",
+  "#98df8a",
+  "#ff9896",
+  "#c5b0d5",
+  "#c49c94",
+  "#f7b6d2",
+  "#c7c7c7",
+  "#dbdb8d",
+  "#9edae5",
+];
+
 // Función para transformar los datos
 function processData(data) {
   return data.map((empresa) => ({
@@ -62,13 +87,13 @@ function renderTreemap(transformedData) {
           return `${d.empresa}\nParticipaciones: ${d.value.toLocaleString()}`;
         } else {
           let label = d.tenderTitle || "";
-          if (d.hasSistema2) {
+          if (d.isSupplier) {
             label = "★ " + label;
           }
           if (d.hasEntePublicoMatch) {
             label = "✓ " + label;
           }
-          if (d.isSupplier) label = "⚑ " + label;
+          if (d.hasSistema2) label = "⚑ " + label;
           return label;
         }
       },
