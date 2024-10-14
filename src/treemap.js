@@ -14,19 +14,44 @@ function processData(data) {
       tenderTitle: sistema6.tender.title,
       value: 1,
       hasSistema2: empresa.participaciones.some((p) => p.sistema2),
+      hasEntePublicoMatch: empresa.participaciones.some(
+        (p) =>
+          p.nombreEntePublico &&
+          sistema6.buyer &&
+          sistema6.buyer.name &&
+          p.nombreEntePublico.toLowerCase() ===
+            sistema6.buyer.name.toLowerCase()
+      ),
     })),
   }));
 }
 
 // Función para filtrar los datos
-function filterData(data, onlySistema2) {
-  if (!onlySistema2) return data;
-
+function filterData(data, onlySistema2, onlyEntePublicoMatch) {
   return data
-    .filter((empresa) => empresa.participaciones.some((p) => p.sistema2))
+    .filter((empresa) => {
+      if (onlySistema2 && !empresa.participaciones.some((p) => p.sistema2)) {
+        return false;
+      }
+      if (
+        onlyEntePublicoMatch &&
+        !empresa.children.some((child) => child.hasEntePublicoMatch)
+      ) {
+        return false;
+      }
+      return true;
+    })
     .map((empresa) => ({
       ...empresa,
-      children: empresa.children,
+      children: empresa.children.filter((child) => {
+        if (onlySistema2 && !child.hasSistema2) {
+          return false;
+        }
+        if (onlyEntePublicoMatch && !child.hasEntePublicoMatch) {
+          return false;
+        }
+        return true;
+      }),
       value: empresa.children.length,
     }))
     .filter((empresa) => empresa.value > 0);
@@ -35,6 +60,7 @@ function filterData(data, onlySistema2) {
 function renderTreemap(transformedData) {
   const backButton = document.getElementById("backButton");
   const sistema2Checkbox = document.getElementById("sistema2Filter");
+  const entePublicoCheckbox = document.getElementById("entePublicoFilter");
 
   const visualization = new d3plus.Treemap()
     .data(transformedData)
@@ -49,6 +75,9 @@ function renderTreemap(transformedData) {
           if (d.hasSistema2) {
             label = "★ " + label;
           }
+          if (d.hasEntePublicoMatch) {
+            label = "✓ " + label;
+          }
           return label;
         }
       },
@@ -61,6 +90,9 @@ function renderTreemap(transformedData) {
         let label = d.tenderTitle || "";
         if (d.hasSistema2) {
           label = "★ " + label;
+        }
+        if (d.hasEntePublicoMatch) {
+          label = "✓ " + label;
         }
         return label;
       }
@@ -132,13 +164,20 @@ function renderTreemap(transformedData) {
     }
   });
 
-  sistema2Checkbox.addEventListener("change", function () {
-    const filteredData = filterData(allData, this.checked);
+  function applyFilters() {
+    const filteredData = filterData(
+      allData,
+      sistema2Checkbox.checked,
+      entePublicoCheckbox.checked
+    );
     currentData = filteredData;
     visualization.config({ data: filteredData }).render();
     backButton.style.display = "none";
     document.getElementById("detalleParticipaciones").innerHTML = "";
-  });
+  }
+
+  sistema2Checkbox.addEventListener("change", applyFilters);
+  entePublicoCheckbox.addEventListener("change", applyFilters);
 }
 
 function updateParticipacionesDetails(d) {
