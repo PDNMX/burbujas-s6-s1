@@ -17,6 +17,7 @@ function processData(data) {
     children: empresa.sistema6.map((sistema6, sistemaIndex) => ({
       ...sistema6,
       id: sistemaIndex,
+      /* empresa: empresa.nombreEmpresa, */
       tenderTitle: sistema6.tender.title,
       value: 1,
       hasSistema2: empresa.participaciones.some((p) => p.sistema2),
@@ -67,7 +68,10 @@ function renderTreemap(transformedData) {
         if (d.children && d.children.length > 0) {
           return `${d.empresa}\nParticipaciones: ${d.value.toLocaleString()}`;
         } else {
-          let label = d.tenderTitle || "";
+                  let label = d.buyer
+                    ? d.buyer.name || "No disponible"
+                    : "No disponible";
+
           if (d.isSupplier) {
             label = "★ " + label;
           }
@@ -80,18 +84,13 @@ function renderTreemap(transformedData) {
       },
     })
     .select("#chart")
+    // label en title del tooltip
     .label(function (d) {
       if (d.children && d.children.length > 0) {
         return d.empresa;
       } else {
-        let label = d.tenderTitle || "";
-        if (d.isSupplier) {
-          label = "★ " + label;
-        }
-        if (d.hasEntePublicoMatch) {
-          label = "⚑ " + label;
-        }
-        if (d.hasSistema2) label = "✓ " + label;
+        //console.log(d)
+        let label = d.buyer ? d.buyer.name || "No disponible" : "No disponible";
         return label;
       }
     })
@@ -120,10 +119,10 @@ function renderTreemap(transformedData) {
           rows.push(["Participaciones", d.value.toLocaleString()]);
           rows.push(["RFC", d.rfc || "No disponible"]);
         } else {
-          rows.push([
-            "Comprador",
-            d.buyer ? d.buyer.name || "No disponible" : "No disponible",
-          ]);
+          /* rows.push([
+            "Nombre de la Empresa",
+            d.empresa || "No disponible",
+          ]); */
           if (d.tender) {
             rows.push([
               "Fecha de Inicio",
