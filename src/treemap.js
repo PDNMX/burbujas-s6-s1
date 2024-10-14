@@ -1,30 +1,11 @@
 let currentData = null;
 let allData = null;
 
-const parentColors = [
-  "#1f77b4",
-  "#ff7f0e",
-  "#2ca02c",
-  "#d62728",
-  "#9467bd",
-  "#8c564b",
-  "#e377c2",
-  "#7f7f7f",
-  "#bcbd22",
-  "#17becf",
-];
-const childColors = [
-  "#aec7e8",
-  "#ffbb78",
-  "#98df8a",
-  "#ff9896",
-  "#c5b0d5",
-  "#c49c94",
-  "#f7b6d2",
-  "#c7c7c7",
-  "#dbdb8d",
-  "#9edae5",
-];
+const childColors = {
+  default: "#FFF59D", // Amarillo claro
+  supplier: "#FFB74D", // Naranja
+  supplierWithSistema2: "#EF5350", // Rojo
+};
 
 // Función para transformar los datos
 function processData(data) {
@@ -91,9 +72,9 @@ function renderTreemap(transformedData) {
             label = "★ " + label;
           }
           if (d.hasEntePublicoMatch) {
-            label = "✓ " + label;
+            label = "⚑  " + label;
           }
-          if (d.hasSistema2) label = "⚑ " + label;
+          if (d.hasSistema2) label = "✓ " + label;
           return label;
         }
       },
@@ -104,17 +85,34 @@ function renderTreemap(transformedData) {
         return d.empresa;
       } else {
         let label = d.tenderTitle || "";
-        if (d.hasSistema2) {
+        if (d.isSupplier) {
           label = "★ " + label;
         }
         if (d.hasEntePublicoMatch) {
-          label = "✓ " + label;
+          label = "⚑ " + label;
         }
+        if (d.hasSistema2) label = "✓ " + label;
         return label;
       }
     })
     .sum("value")
     .tile("squarify")
+    .color((d) => {
+      if (d.children) {
+        // Color para rectángulos padres basado en el valor
+        return d.value;
+      } else {
+        // Color para rectángulos hijos
+        if (d.isSupplier && d.hasSistema2) {
+          return childColors.supplierWithSistema2;
+        } else if (d.isSupplier) {
+          return childColors.supplier;
+        } else {
+          return childColors.default;
+        }
+      }
+    })
+    .legend(false)
     .tooltipConfig({
       tbody: function (d) {
         let rows = [];
