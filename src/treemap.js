@@ -22,43 +22,33 @@ function processData(data) {
           p.nombreEntePublico.toLowerCase() ===
             sistema6.buyer.name.toLowerCase()
       ),
+      isSupplier: sistema6.partiesMatch.isSupplier,
     })),
   }));
 }
 
 // Función para filtrar los datos
-function filterData(data, onlySistema2, onlyEntePublicoMatch) {
+function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier) {
   return data
-    .filter((empresa) => {
-      if (onlySistema2 && !empresa.participaciones.some((p) => p.sistema2)) {
-        return false;
-      }
-      if (
-        onlyEntePublicoMatch &&
-        !empresa.children.some((child) => child.hasEntePublicoMatch)
-      ) {
-        return false;
-      }
-      return true;
-    })
-    .map((empresa) => ({
-      ...empresa,
-      children: empresa.children.filter((child) => {
-        if (onlySistema2 && !child.hasSistema2) {
-          return false;
-        }
-        if (onlyEntePublicoMatch && !child.hasEntePublicoMatch) {
-          return false;
-        }
+    .map((empresa) => {
+      const filteredChildren = empresa.children.filter((child) => {
+        if (onlySistema2 && !child.hasSistema2) return false;
+        if (onlyEntePublicoMatch && !child.hasEntePublicoMatch) return false;
+        if (onlySupplier && !child.isSupplier) return false;
         return true;
-      }),
-      value: empresa.children.length,
-    }))
-    .filter((empresa) => empresa.value > 0);
+      });
+      return {
+        ...empresa,
+        children: filteredChildren,
+        value: filteredChildren.length,
+      };
+    })
+    .filter((empresa) => empresa.children.length > 0);
 }
 
 function renderTreemap(transformedData) {
   const backButton = document.getElementById("backButton");
+  const supplierCheckbox = document.getElementById("supplierFilter");
   const sistema2Checkbox = document.getElementById("sistema2Filter");
   const entePublicoCheckbox = document.getElementById("entePublicoFilter");
 
@@ -78,6 +68,7 @@ function renderTreemap(transformedData) {
           if (d.hasEntePublicoMatch) {
             label = "✓ " + label;
           }
+          if (d.isSupplier) label = "⚑ " + label;
           return label;
         }
       },
@@ -168,7 +159,8 @@ function renderTreemap(transformedData) {
     const filteredData = filterData(
       allData,
       sistema2Checkbox.checked,
-      entePublicoCheckbox.checked
+      entePublicoCheckbox.checked,
+      supplierCheckbox.checked
     );
     currentData = filteredData;
     visualization.config({ data: filteredData }).render();
@@ -176,6 +168,7 @@ function renderTreemap(transformedData) {
     document.getElementById("detalleParticipaciones").innerHTML = "";
   }
 
+  supplierCheckbox.addEventListener("change", applyFilters);
   sistema2Checkbox.addEventListener("change", applyFilters);
   entePublicoCheckbox.addEventListener("change", applyFilters);
 }
