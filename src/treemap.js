@@ -1,9 +1,9 @@
 let currentData = null;
-let allData = null; // Variable para almacenar todos los datos originales
+let allData = null;
 
 // Función para transformar los datos
 function processData(data) {
-  return data.map((empresa, empresaIndex) => ({
+  return data.map((empresa) => ({
     ...empresa,
     empresa: empresa.nombreEmpresa,
     rfc: empresa.rfc,
@@ -13,29 +13,28 @@ function processData(data) {
       id: sistemaIndex,
       tenderTitle: sistema6.tender.title,
       value: 1,
-      isSupplier: sistema6.partiesMatch.isSupplier,
+      hasSistema2: empresa.participaciones.some((p) => p.sistema2),
     })),
   }));
 }
 
 // Función para filtrar los datos
-function filterData(data, onlySuppliers) {
-  if (!onlySuppliers) return data;
+function filterData(data, onlySistema2) {
+  if (!onlySistema2) return data;
 
   return data
+    .filter((empresa) => empresa.participaciones.some((p) => p.sistema2))
     .map((empresa) => ({
       ...empresa,
-      children: empresa.children.filter((child) => child.isSupplier),
-      value: empresa.children.filter((child) => child.isSupplier).length,
+      children: empresa.children,
+      value: empresa.children.length,
     }))
     .filter((empresa) => empresa.value > 0);
 }
 
-// Las funciones processData y filterData permanecen sin cambios
-
 function renderTreemap(transformedData) {
   const backButton = document.getElementById("backButton");
-  const supplierCheckbox = document.getElementById("supplierFilter");
+  const sistema2Checkbox = document.getElementById("sistema2Filter");
 
   const visualization = new d3plus.Treemap()
     .data(transformedData)
@@ -47,7 +46,7 @@ function renderTreemap(transformedData) {
           return `${d.empresa}\nParticipaciones: ${d.value.toLocaleString()}`;
         } else {
           let label = d.tenderTitle || "";
-          if (d.isSupplier) {
+          if (d.hasSistema2) {
             label = "★ " + label;
           }
           return label;
@@ -60,7 +59,7 @@ function renderTreemap(transformedData) {
         return d.empresa;
       } else {
         let label = d.tenderTitle || "";
-        if (d.isSupplier) {
+        if (d.hasSistema2) {
           label = "★ " + label;
         }
         return label;
@@ -72,11 +71,9 @@ function renderTreemap(transformedData) {
       tbody: function (d) {
         let rows = [];
         if (d.children && d.children.length > 0) {
-          /* rows.push(["Empresa", d.empresa]); */
           rows.push(["Participaciones", d.value.toLocaleString()]);
           rows.push(["RFC", d.rfc || "No disponible"]);
         } else {
-          /* rows.push(["Título de Licitación", d.tenderTitle || "No disponible"]); */
           rows.push([
             "Comprador",
             d.buyer ? d.buyer.name || "No disponible" : "No disponible",
@@ -123,7 +120,6 @@ function renderTreemap(transformedData) {
         visualization.config({ data: transformedData }).render();
       }
 
-      // Actualizar el div de detalles de participaciones
       updateParticipacionesDetails(d);
     })
     .render();
@@ -136,7 +132,7 @@ function renderTreemap(transformedData) {
     }
   });
 
-  supplierCheckbox.addEventListener("change", function () {
+  sistema2Checkbox.addEventListener("change", function () {
     const filteredData = filterData(allData, this.checked);
     currentData = filteredData;
     visualization.config({ data: filteredData }).render();
@@ -145,7 +141,6 @@ function renderTreemap(transformedData) {
   });
 }
 
-// Nueva función para actualizar los detalles de participaciones
 function updateParticipacionesDetails(d) {
   var detalleDiv = document.getElementById("detalleParticipaciones");
   detalleDiv.innerHTML = "";
@@ -158,52 +153,49 @@ function updateParticipacionesDetails(d) {
     participaciones.forEach(function (participacion) {
       var li = document.createElement("li");
       li.innerHTML = `
-                <strong>Nombre:</strong> ${
-                  participacion.nombre || "No disponible"
-                } ${participacion.primerApellido || ""} ${
-        participacion.segundoApellido || ""
-      }<br>
-                <strong>Porcentaje de participación:</strong> ${
-                  participacion.porcentajeParticipacion !== undefined
-                    ? participacion.porcentajeParticipacion + "%"
-                    : "No disponible"
-                }<br>
-                <strong>Recibe remuneración:</strong> ${
-                  participacion.recibeRemuneracion !== undefined
-                    ? participacion.recibeRemuneracion
-                      ? "Sí"
-                      : "No"
-                    : "No disponible"
-                }<br>
-                <strong>Tipo de participación:</strong> ${
-                  participacion.tipoParticipacion || "No disponible"
-                }<br>
-                <strong>Sector de participación:</strong> ${
-                  participacion.sectorParticipacion || "No disponible"
-                }<br>
-                <strong>Cargo:</strong> ${
-                  participacion.empleoCargoComision || "No disponible"
-                }<br>
-                <strong>Ente público:</strong> ${
-                  participacion.nombreEntePublico || "No disponible"
-                }<br>
-                <strong>Fecha de posesión:</strong> ${
-                  participacion.fechaTomaPosesion || "No disponible"
-                }<br>
-                <strong>Contratado por honorarios:</strong> ${
-                  participacion.contratadoPorHonorarios !== undefined
-                    ? participacion.contratadoPorHonorarios
-                      ? "Sí"
-                      : "No"
-                    : "No disponible"
-                }
-            `;
+        <strong>Nombre:</strong> ${participacion.nombre || "No disponible"} ${
+        participacion.primerApellido || ""
+      } ${participacion.segundoApellido || ""}<br>
+        <strong>Porcentaje de participación:</strong> ${
+          participacion.porcentajeParticipacion !== undefined
+            ? participacion.porcentajeParticipacion + "%"
+            : "No disponible"
+        }<br>
+        <strong>Recibe remuneración:</strong> ${
+          participacion.recibeRemuneracion !== undefined
+            ? participacion.recibeRemuneracion
+              ? "Sí"
+              : "No"
+            : "No disponible"
+        }<br>
+        <strong>Tipo de participación:</strong> ${
+          participacion.tipoParticipacion || "No disponible"
+        }<br>
+        <strong>Sector de participación:</strong> ${
+          participacion.sectorParticipacion || "No disponible"
+        }<br>
+        <strong>Cargo:</strong> ${
+          participacion.empleoCargoComision || "No disponible"
+        }<br>
+        <strong>Ente público:</strong> ${
+          participacion.nombreEntePublico || "No disponible"
+        }<br>
+        <strong>Fecha de posesión:</strong> ${
+          participacion.fechaTomaPosesion || "No disponible"
+        }<br>
+        <strong>Contratado por honorarios:</strong> ${
+          participacion.contratadoPorHonorarios !== undefined
+            ? participacion.contratadoPorHonorarios
+              ? "Sí"
+              : "No"
+            : "No disponible"
+        }<br>
+        <strong>Sistema 2:</strong> ${participacion.sistema2 ? "Sí" : "No"}
+      `;
       ul.appendChild(li);
     });
     detalleDiv.appendChild(ul);
-  } /* else {
-        detalleDiv.innerHTML = "<p>No hay detalles de participaciones disponibles.</p>";
-    } */
+  }
 }
 
 // Uso de la función
