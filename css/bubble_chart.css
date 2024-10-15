@@ -2,7 +2,6 @@
   cursor: pointer;
 }
 
-
 #vis {
   width: 940px;
   height: 600px;
@@ -81,6 +80,3 @@
   color: #999;
   clear: both;
 }
-
-.my-legend a {
-  co

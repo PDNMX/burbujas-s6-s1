@@ -1,10 +1,12 @@
 let currentData = null;
 let allData = null;
+let currentEmpresa = "";
 
 const childColors = {
-  default: "#FFF59D", // Amarillo claro
-  supplier: "#FFB74D", // Naranja
-  supplierWithSistema2: "#EF5350", // Rojo
+  default: "#d3d3d1", // 
+  withSupplier: "#FFF59D", // Amarillo claro
+  withEqualEnte: "#FFB74D", // Naranja
+  withSistema2: "#EF5350", // Rojo
 };
 
 // Función para transformar los datos
@@ -36,6 +38,7 @@ function processData(data) {
 
 // Función para filtrar los datos
 function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier) {
+  currentEmpresa = ""; 
   return data
     .map((empresa) => {
       const filteredChildren = empresa.children.filter((child) => {
@@ -53,11 +56,13 @@ function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier) {
     .filter((empresa) => empresa.children.length > 0);
 }
 
-function renderTreemap(transformedData) {
+function renderTreemap(transformedData) { 
   const backButton = document.getElementById("backButton");
+  const leyendaColores = document.getElementById("leyendaColores");
   const supplierCheckbox = document.getElementById("supplierFilter");
   const sistema2Checkbox = document.getElementById("sistema2Filter");
   const entePublicoCheckbox = document.getElementById("entePublicoFilter");
+  const cardDetalleParticipaciones = document.getElementById("cardDetalleParticipaciones");
 
   function applyFilters() {
     const filteredData = filterData(
@@ -70,6 +75,8 @@ function renderTreemap(transformedData) {
     currentData = filteredData;
     visualization.config({ data: filteredData }).render();
     backButton.style.display = "none";
+    leyendaColores.style.display = "none";
+    cardDetalleParticipaciones.style.display = "none";
     document.getElementById("detalleParticipaciones").innerHTML = "";
   }
 
@@ -78,6 +85,7 @@ function renderTreemap(transformedData) {
     .groupBy(["empresa", "id"])
     .sum("value")
     .shapeConfig({
+      /* fill: d => d.empresa === "IPN" ? "green" : "orange", */
       label: (d) => {
         if (d.children && d.children.length > 0) {
           return `${d.empresa}\nParticipaciones: ${d.value.toLocaleString()}`;
@@ -117,9 +125,11 @@ function renderTreemap(transformedData) {
       } else {
         // Color para rectángulos hijos
         if (d.isSupplier && d.hasSistema2) {
-          return childColors.supplierWithSistema2;
+          return childColors.withSistema2;
+        } else if (d.hasEntePublicoMatch) {
+          return childColors.withEqualEnte;
         } else if (d.isSupplier) {
-          return childColors.supplier;
+          return childColors.withSupplier;
         } else {
           return childColors.default;
         }
@@ -172,7 +182,10 @@ function renderTreemap(transformedData) {
     .on("click", function (d) {
       if (d.children) {
         currentData = transformedData;
+        currentEmpresa = d.empresa;
         backButton.style.display = "block";
+        leyendaColores.style.display = "block";
+        cardDetalleParticipaciones.style.display = "block";
         visualization.config({ data: d.children }).render();
         
       } /* else {
@@ -183,13 +196,28 @@ function renderTreemap(transformedData) {
       } */
       updateParticipacionesDetails(d);
     })
+    .title(() => {
+      return currentEmpresa || false;
+    })
+    .titleConfig(
+      {
+        "ariaHidden": true,
+        "fontSize": 20,
+        "padding": 3,
+        "resize": true,
+        "textAnchor": "middle"
+      }
+    )
     .render();
 
   backButton.addEventListener("click", function () {
     applyFilters();
     if (currentData) {
+      currentEmpresa = ""; 
       visualization.config({ data: currentData }).render();
       backButton.style.display = "none";
+      leyendaColores.style.display = "none";
+      cardDetalleParticipaciones.style.display = "none";
       document.getElementById("detalleParticipaciones").innerHTML = "";
     }
   });
