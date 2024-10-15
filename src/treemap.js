@@ -59,6 +59,20 @@ function renderTreemap(transformedData) {
   const sistema2Checkbox = document.getElementById("sistema2Filter");
   const entePublicoCheckbox = document.getElementById("entePublicoFilter");
 
+  function applyFilters() {
+    const filteredData = filterData(
+      allData,
+      sistema2Checkbox.checked,
+      entePublicoCheckbox.checked,
+      supplierCheckbox.checked
+    );
+
+    currentData = filteredData;
+    visualization.config({ data: filteredData }).render();
+    backButton.style.display = "none";
+    document.getElementById("detalleParticipaciones").innerHTML = "";
+  }
+
   const visualization = new d3plus.Treemap()
     .data(transformedData)
     .groupBy(["empresa", "id"])
@@ -68,9 +82,9 @@ function renderTreemap(transformedData) {
         if (d.children && d.children.length > 0) {
           return `${d.empresa}\nParticipaciones: ${d.value.toLocaleString()}`;
         } else {
-                  let label = d.buyer
-                    ? d.buyer.name || "No disponible"
-                    : "No disponible";
+          let label = d.buyer
+            ? d.buyer.name || "No disponible"
+            : "No disponible";
 
           if (d.isSupplier) {
             label = "★ " + label;
@@ -160,35 +174,25 @@ function renderTreemap(transformedData) {
         currentData = transformedData;
         backButton.style.display = "block";
         visualization.config({ data: d.children }).render();
-      } else {
+        
+      } /* else {
+        //applyFilters();
         backButton.style.display = "none";
         visualization.config({ data: transformedData }).render();
-      }
-
+        
+      } */
       updateParticipacionesDetails(d);
     })
     .render();
 
   backButton.addEventListener("click", function () {
+    applyFilters();
     if (currentData) {
       visualization.config({ data: currentData }).render();
       backButton.style.display = "none";
       document.getElementById("detalleParticipaciones").innerHTML = "";
     }
   });
-
-  function applyFilters() {
-    const filteredData = filterData(
-      allData,
-      sistema2Checkbox.checked,
-      entePublicoCheckbox.checked,
-      supplierCheckbox.checked
-    );
-    currentData = filteredData;
-    visualization.config({ data: filteredData }).render();
-    backButton.style.display = "none";
-    document.getElementById("detalleParticipaciones").innerHTML = "";
-  }
 
   supplierCheckbox.addEventListener("change", applyFilters);
   sistema2Checkbox.addEventListener("change", applyFilters);
