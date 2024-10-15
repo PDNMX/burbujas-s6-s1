@@ -19,7 +19,6 @@ function processData(data) {
     children: empresa.sistema6.map((sistema6, sistemaIndex) => ({
       ...sistema6,
       id: sistemaIndex,
-      /* empresa: empresa.nombreEmpresa, */
       tenderTitle: sistema6.tender.title,
       value: 1,
       hasSistema2: empresa.participaciones.some((p) => p.sistema2),
@@ -149,6 +148,10 @@ function renderTreemap(transformedData) {
           ]); */
           if (d.tender) {
             rows.push([
+              "Nombre de la Contratación",
+              d.tenderTitle || "No disponible"
+            ]);
+            rows.push([
               "Fecha de Inicio",
               d.tender.tenderPeriod
                 ? d.tender.tenderPeriod.startDate || "No disponible"
@@ -235,55 +238,83 @@ function updateParticipacionesDetails(d) {
     let participaciones = Array.isArray(d.participaciones)
       ? d.participaciones
       : [d.participaciones];
-    var ul = document.createElement("ul");
-    participaciones.forEach(function (participacion) {
-      var li = document.createElement("li");
-      li.innerHTML = `
-        <strong>Nombre:</strong> ${participacion.nombre || "No disponible"} ${
-        participacion.primerApellido || ""
-      } ${participacion.segundoApellido || ""}<br>
-        <strong>Porcentaje de participación:</strong> ${
-          participacion.porcentajeParticipacion !== undefined
-            ? participacion.porcentajeParticipacion + "%"
-            : "No disponible"
-        }<br>
-        <strong>Recibe remuneración:</strong> ${
-          participacion.recibeRemuneracion !== undefined
-            ? participacion.recibeRemuneracion
-              ? "Sí"
-              : "No"
-            : "No disponible"
-        }<br>
-        <strong>Tipo de participación:</strong> ${
-          participacion.tipoParticipacion || "No disponible"
-        }<br>
-        <strong>Sector de participación:</strong> ${
-          participacion.sectorParticipacion || "No disponible"
-        }<br>
-        <strong>Cargo:</strong> ${
-          participacion.empleoCargoComision || "No disponible"
-        }<br>
-        <strong>Ente público:</strong> ${
-          participacion.nombreEntePublico || "No disponible"
-        }<br>
-        <strong>Fecha de posesión:</strong> ${
-          participacion.fechaTomaPosesion || "No disponible"
-        }<br>
-        <strong>Contratado por honorarios:</strong> ${
-          participacion.contratadoPorHonorarios !== undefined
-            ? participacion.contratadoPorHonorarios
-              ? "Sí"
-              : "No"
-            : "No disponible"
-        }<br>
+
+    // Crear el contenedor del accordion
+    var accordion = document.createElement("div");
+    accordion.className = "accordion accordion-flush";
+    var accordionId = "participacionesAccordion" + Date.now(); // ID único
+    accordion.id = accordionId;
+
+    participaciones.forEach(function (participacion, index) {
+      var accordionItem = document.createElement("div");
+      accordionItem.className = "accordion-item";
+
+      var headerId = `heading${accordionId}${index}`;
+      var collapseId = `collapse${accordionId}${index}`;
+
+      // Crear el encabezado del accordion
+      var header = document.createElement("h2");
+      header.className = "accordion-header";
+      header.id = headerId;
+
+      var button = document.createElement("button");
+      button.className = "accordion-button collapsed";
+      button.type = "button";
+      button.setAttribute("data-bs-toggle", "collapse");
+      button.setAttribute("data-bs-target", `#${collapseId}`);
+      button.setAttribute("aria-expanded", "false");
+      button.setAttribute("aria-controls", collapseId);
+      
+      // Añadir icono de Font Awesome
+      var icon = document.createElement("i");
+      icon.className = "fa fa-user fa-fw me-2";
+      button.appendChild(icon);
+
+      // Añadir texto
+      var textSpan = document.createElement("span");
+      textSpan.innerHTML = `${participacion.nombre || ""} ${participacion.primerApellido || ""} ${participacion.segundoApellido || ""} - ${participacion.nombreEntePublico || "Ente no disponible"}`;
+      button.appendChild(textSpan);
+
+      header.appendChild(button);
+
+      // Crear el cuerpo del accordion
+      var collapse = document.createElement("div");
+      collapse.id = collapseId;
+      collapse.className = "accordion-collapse collapse";
+      collapse.setAttribute("aria-labelledby", headerId);
+      collapse.setAttribute("data-bs-parent", `#${accordionId}`);
+
+      var body = document.createElement("div");
+      body.className = "accordion-body";
+      body.innerHTML = `
+        <strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? participacion.porcentajeParticipacion + "%" : "No disponible"}<br>
+        <strong>Recibe remuneración:</strong> ${participacion.recibeRemuneracion !== undefined ? (participacion.recibeRemuneracion ? "Sí" : "No") : "No disponible"}<br>
+        <strong>Tipo de participación:</strong> ${participacion.tipoParticipacion || "No disponible"}<br>
+        <strong>Sector de participación:</strong> ${participacion.sectorParticipacion || "No disponible"}<br>
+        <strong>Cargo:</strong> ${participacion.empleoCargoComision || "No disponible"}<br>
+        <strong>Fecha de posesión:</strong> ${participacion.fechaTomaPosesion || "No disponible"}<br>
+        <strong>Contratado por honorarios:</strong> ${participacion.contratadoPorHonorarios !== undefined ? (participacion.contratadoPorHonorarios ? "Sí" : "No") : "No disponible"}<br>
         <strong>Sistema 2:</strong> ${participacion.sistema2 ? "Sí" : "No"}
       `;
-      ul.appendChild(li);
+
+      collapse.appendChild(body);
+
+      // Agregar el encabezado y el cuerpo al item del accordion
+      accordionItem.appendChild(header);
+      accordionItem.appendChild(collapse);
+
+      // Agregar el item al accordion
+      accordion.appendChild(accordionItem);
     });
-    detalleDiv.appendChild(ul);
+
+    // Agregar el accordion al div de detalles
+    detalleDiv.appendChild(accordion);
+
+    // No es necesario inicializar manualmente el accordion en Bootstrap 5
+  } else {
+    detalleDiv.innerHTML = "<p>No hay detalles de participaciones disponibles.</p>";
   }
 }
-
 // Uso de la función
 fetch("data/treemap.json")
   .then((response) => response.json())
