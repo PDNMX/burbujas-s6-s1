@@ -152,41 +152,45 @@ function renderTreemap(transformedData) {
           rows.push(["Participaciones", d.value.toLocaleString()]);
           rows.push(["RFC", d.rfc || "No disponible"]);
         } else {
-          /* rows.push([
-            "Nombre de la Empresa",
-            d.empresa || "No disponible",
-          ]); */
+          // Si existe d.tender, agregar sus datos
           if (d.tender) {
             rows.push([
-              "Nombre de la Contratación",
+              "Título de la licitación",
               d.tenderTitle || "No disponible"
             ]);
             rows.push([
-              "Fecha de Inicio",
+              "Periodo de licitación - Fecha de Inicio",
               d.tender.tenderPeriod
                 ? d.tender.tenderPeriod.startDate || "No disponible"
                 : "No disponible",
             ]);
             rows.push([
-              "Fecha de Finalización",
+              "Periodo de evaluación y adjudicación - Fecha de Término",
               d.tender.awardPeriod
                 ? d.tender.awardPeriod.endDate || "No disponible"
                 : "No disponible",
             ]);
             rows.push([
-              "Método de Adquisición",
+              "Método de Contratación",
               d.tender.procurementMethod || "No disponible",
             ]);
             rows.push([
-              "Entidad Compradora",
+              "Nombre del actor",
               d.tender.procuringEntity
                 ? d.tender.procuringEntity.name || "No disponible"
                 : "No disponible",
             ]);
             rows.push([
-              "Estado del Proceso",
+              "Estatus de la licitación",
               d.tender.status || "No disponible",
             ]);
+            // Agregar los requestingUnits si existen
+            if (d.planning && Array.isArray(d.planning.requestingUnits)) {
+              //rows.push(["Áreas Requirentes", ""]); // Encabezado
+              d.planning.requestingUnits.forEach((unit, index) => {
+                rows.push([index === 0 ? `Área Requirente (${index + 1})` : "", unit.name || "No disponible"]);
+              });
+            }
           }
         }
         return rows;
@@ -314,13 +318,14 @@ function updateParticipacionesDetails(d) {
 
       // Contenido principal
       var mainContent = `
+        <div><strong>Cargo:</strong> ${participacion.empleoCargoComision || "No disponible"}</div>
+        <div><strong>Fecha de posesión:</strong> ${participacion.fechaTomaPosesion || "No disponible"}</div>
+        <div><strong>Contratado por honorarios:</strong> ${participacion.contratadoPorHonorarios !== undefined ? (participacion.contratadoPorHonorarios ? "Sí" : "No") : "No disponible"}</div>
+        <div><strong>Área de adscripción:</strong> ${participacion.areaAdscripcion || "No disponible"}</div>
         <div><strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? participacion.porcentajeParticipacion + "%" : "No disponible"}</div>
         <div><strong>Recibe remuneración:</strong> ${participacion.recibeRemuneracion !== undefined ? (participacion.recibeRemuneracion ? "Sí" : "No") : "No disponible"}</div>
         <div><strong>Tipo de participación:</strong> ${participacion.tipoParticipacion || "No disponible"}</div>
         <div><strong>Sector de participación:</strong> ${participacion.sectorParticipacion || "No disponible"}</div>
-        <div><strong>Cargo:</strong> ${participacion.empleoCargoComision || "No disponible"}</div>
-        <div><strong>Fecha de posesión:</strong> ${participacion.fechaTomaPosesion || "No disponible"}</div>
-        <div><strong>Contratado por honorarios:</strong> ${participacion.contratadoPorHonorarios !== undefined ? (participacion.contratadoPorHonorarios ? "Sí" : "No") : "No disponible"}</div>
       `;
 
       body.innerHTML = mainContent;
