@@ -183,21 +183,21 @@ function renderTreemap(transformedData) {
       },
     })
     .on("click", function (d) {
-      if (d.children) {
+      if (d.children && d.children.length > 0) {
         currentData = transformedData;
         currentEmpresa = d.empresa;
         backButton.style.display = "block";
         leyendaColores.style.display = "block";
         cardDetalleParticipaciones.style.display = "block";
         visualization.config({ data: d.children }).render();
-        
+        updateParticipacionesDetails(d)
       } /* else {
         //applyFilters();
         backButton.style.display = "none";
         visualization.config({ data: transformedData }).render();
         
       } */
-      updateParticipacionesDetails(d);
+      //updateParticipacionesDetails(d);
     })
     .title(() => {
       return currentEmpresa || false;
