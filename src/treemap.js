@@ -119,8 +119,18 @@ function renderTreemap(transformedData) {
     .tile("squarify")
     .color((d) => {
       if (d.children) {
-        // Color para rectángulos padres basado en el valor
-        return d.value;
+        // Colores en tonos azules según el valor de d.value
+        if (d.value < 10) {
+          return "#68B4D2"; // Azul muy claro
+        } else if (d.value < 50) {
+          return "#7FB6E8"; // Azul claro
+        } else if (d.value < 100) {
+          return "#B39CD8"; // Azul intermedio
+        } else if (d.value < 500) {
+          return "#D5A7E5"; // Azul más oscuro
+        } else {
+          return "#A88A9B"; // Azul muy oscuro
+        }
       } else {
         // Color para rectángulos hijos
         if (d.isSupplier && d.hasSistema2) {
