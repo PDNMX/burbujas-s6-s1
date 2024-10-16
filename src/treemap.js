@@ -1,6 +1,7 @@
 let currentData = null;
 let allData = null;
 let currentEmpresa = "";
+let visualization = null;
 
 const childColors = {
   default: "#d3d3d1", // 
@@ -28,55 +29,74 @@ function processData(data) {
           sistema6.buyer &&
           sistema6.buyer.name &&
           p.nombreEntePublico.toLowerCase() ===
-            sistema6.buyer.name.toLowerCase()
+          sistema6.buyer.name.toLowerCase()
       ),
       isSupplier: sistema6.partiesMatch.isSupplier,
     })),
   }));
 }
 
+
+
 // Función para filtrar los datos
-function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier) {
-  currentEmpresa = ""; 
+function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, searchTerm = '') {
+  currentEmpresa = "";
   return data
     .map((empresa) => {
+      if (searchTerm && !empresa.nombreEmpresa.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !empresa.rfc.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return null;
+      }
+
       const filteredChildren = empresa.children.filter((child) => {
         if (onlySistema2 && !child.hasSistema2) return false;
         if (onlyEntePublicoMatch && !child.hasEntePublicoMatch) return false;
         if (onlySupplier && !child.isSupplier) return false;
         return true;
       });
+
       return {
         ...empresa,
         children: filteredChildren,
         value: filteredChildren.length,
       };
     })
-    .filter((empresa) => empresa.children.length > 0);
+    .filter((empresa) => empresa && empresa.children.length > 0);
 }
 
-function renderTreemap(transformedData) { 
+function renderTreemap(transformedData) {
   const backButton = document.getElementById("backButton");
   const leyendaColores = document.getElementById("leyendaColores");
   const supplierCheckbox = document.getElementById("supplierFilter");
   const sistema2Checkbox = document.getElementById("sistema2Filter");
   const entePublicoCheckbox = document.getElementById("entePublicoFilter");
   const cardDetalleParticipaciones = document.getElementById("cardDetalleParticipaciones");
+  const searchInput = document.getElementById("searchInput");
+  const loadingSpinner = document.getElementById("loadingSpinner");
+  // Función debounce para optimizar la búsqueda
+  const debouncedApplyFilters = _.debounce(applyFilters, 300);
 
   function applyFilters() {
-    const filteredData = filterData(
-      allData,
-      sistema2Checkbox.checked,
-      entePublicoCheckbox.checked,
-      supplierCheckbox.checked
-    );
+    loadingSpinner.style.display = "inline-block";
 
-    currentData = filteredData;
-    visualization.config({ data: filteredData }).render();
-    backButton.style.display = "none";
-    leyendaColores.style.display = "none";
-    cardDetalleParticipaciones.style.display = "none";
-    document.getElementById("detalleParticipaciones").innerHTML = "";
+    setTimeout(() => {
+      const filteredData = filterData(
+        allData,
+        sistema2Checkbox.checked,
+        entePublicoCheckbox.checked,
+        supplierCheckbox.checked,
+        searchInput.value
+      );
+
+      currentData = filteredData;
+      visualization.config({ data: filteredData }).render();
+      backButton.style.display = "none";
+      leyendaColores.style.display = "none";
+      cardDetalleParticipaciones.style.display = "none";
+      document.getElementById("detalleParticipaciones").innerHTML = "";
+
+      loadingSpinner.style.display = "none";
+    }, 0);
   }
 
   const visualization = new d3plus.Treemap()
@@ -87,7 +107,7 @@ function renderTreemap(transformedData) {
       /* fill: d => d.empresa === "IPN" ? "green" : "orange", */
       label: (d) => {
         if (d.children && d.children.length > 0) {
-          return `${d.empresa}\nLicitaciones: ${d.value.toLocaleString()}`;
+          return `${d.empresa}\n<b>Licitaciones:</b> ${d.value.toLocaleString()}\n<b>RFC:</b> ${d.rfc}`;
         } else {
           let label = d.buyer
             ? d.buyer.name || "No disponible"
@@ -143,6 +163,17 @@ function renderTreemap(transformedData) {
           return childColors.default;
         }
       }
+    })
+    .noDataHTML(() => {
+      return `<div style="left: 50%; top: 50%; position: absolute; transform: translate(-50%, -50%);">
+        <i class="fa fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+        <h4 class="mb-3">No hay información disponible</h4>
+        <p class="text-muted">
+          No se encontraron datos que coincidan con los criterios de búsqueda actuales.
+          <br>Intenta ajustar los filtros o realizar una nueva búsqueda.
+        </p>
+      
+    </div>`
     })
     .legend(false)
     .tooltipConfig({
@@ -231,19 +262,12 @@ function renderTreemap(transformedData) {
 
   backButton.addEventListener("click", function () {
     applyFilters();
-    if (currentData) {
-      currentEmpresa = ""; 
-      visualization.config({ data: currentData }).render();
-      backButton.style.display = "none";
-      leyendaColores.style.display = "none";
-      cardDetalleParticipaciones.style.display = "none";
-      document.getElementById("detalleParticipaciones").innerHTML = "";
-    }
   });
 
-  supplierCheckbox.addEventListener("change", applyFilters);
-  sistema2Checkbox.addEventListener("change", applyFilters);
-  entePublicoCheckbox.addEventListener("change", applyFilters);
+  supplierCheckbox.addEventListener("change", debouncedApplyFilters);
+  sistema2Checkbox.addEventListener("change", debouncedApplyFilters);
+  entePublicoCheckbox.addEventListener("change", debouncedApplyFilters);
+  searchInput.addEventListener("input", debouncedApplyFilters);
 }
 
 function updateParticipacionesDetails(d) {
