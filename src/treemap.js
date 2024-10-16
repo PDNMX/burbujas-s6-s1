@@ -87,7 +87,7 @@ function renderTreemap(transformedData) {
       /* fill: d => d.empresa === "IPN" ? "green" : "orange", */
       label: (d) => {
         if (d.children && d.children.length > 0) {
-          return `${d.empresa}\nParticipaciones: ${d.value.toLocaleString()}`;
+          return `${d.empresa}\nLicitaciones: ${d.value.toLocaleString()}`;
         } else {
           let label = d.buyer
             ? d.buyer.name || "No disponible"
@@ -208,7 +208,9 @@ function renderTreemap(transformedData) {
         "fontSize": 20,
         "padding": 3,
         "resize": true,
-        "textAnchor": "middle"
+        "textAnchor": "middle",
+        "fill": "red",
+        "color": "red"
       }
     )
     .render();
@@ -239,6 +241,19 @@ function updateParticipacionesDetails(d) {
       ? d.participaciones
       : [d.participaciones];
 
+    // Filtrar participaciones duplicadas
+    const uniqueSet = new Set();
+    participaciones = participaciones.filter(participacion => {
+      const fullName = `${participacion.nombre || ""} ${participacion.primerApellido || ""} ${participacion.segundoApellido || ""}`.trim();
+      const ente = participacion.nombreEntePublico || "Ente no disponible";
+      const key = `${fullName}|${ente}`;
+      if (uniqueSet.has(key)) {
+        return false;
+      }
+      uniqueSet.add(key);
+      return true;
+    });
+
     // Crear el contenedor del accordion
     var accordion = document.createElement("div");
     accordion.className = "accordion accordion-flush";
@@ -264,7 +279,7 @@ function updateParticipacionesDetails(d) {
       button.setAttribute("data-bs-target", `#${collapseId}`);
       button.setAttribute("aria-expanded", "false");
       button.setAttribute("aria-controls", collapseId);
-      
+
       // Añadir icono de Font Awesome
       var icon = document.createElement("i");
       icon.className = "fa fa-user fa-fw me-2";
@@ -286,16 +301,40 @@ function updateParticipacionesDetails(d) {
 
       var body = document.createElement("div");
       body.className = "accordion-body";
-      body.innerHTML = `
-        <strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? participacion.porcentajeParticipacion + "%" : "No disponible"}<br>
-        <strong>Recibe remuneración:</strong> ${participacion.recibeRemuneracion !== undefined ? (participacion.recibeRemuneracion ? "Sí" : "No") : "No disponible"}<br>
-        <strong>Tipo de participación:</strong> ${participacion.tipoParticipacion || "No disponible"}<br>
-        <strong>Sector de participación:</strong> ${participacion.sectorParticipacion || "No disponible"}<br>
-        <strong>Cargo:</strong> ${participacion.empleoCargoComision || "No disponible"}<br>
-        <strong>Fecha de posesión:</strong> ${participacion.fechaTomaPosesion || "No disponible"}<br>
-        <strong>Contratado por honorarios:</strong> ${participacion.contratadoPorHonorarios !== undefined ? (participacion.contratadoPorHonorarios ? "Sí" : "No") : "No disponible"}<br>
-        <strong>Sistema 2:</strong> ${participacion.sistema2 ? "Sí" : "No"}
+
+      // Contenido principal
+      var mainContent = `
+        <div><strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? participacion.porcentajeParticipacion + "%" : "No disponible"}</div>
+        <div><strong>Recibe remuneración:</strong> ${participacion.recibeRemuneracion !== undefined ? (participacion.recibeRemuneracion ? "Sí" : "No") : "No disponible"}</div>
+        <div><strong>Tipo de participación:</strong> ${participacion.tipoParticipacion || "No disponible"}</div>
+        <div><strong>Sector de participación:</strong> ${participacion.sectorParticipacion || "No disponible"}</div>
+        <div><strong>Cargo:</strong> ${participacion.empleoCargoComision || "No disponible"}</div>
+        <div><strong>Fecha de posesión:</strong> ${participacion.fechaTomaPosesion || "No disponible"}</div>
+        <div><strong>Contratado por honorarios:</strong> ${participacion.contratadoPorHonorarios !== undefined ? (participacion.contratadoPorHonorarios ? "Sí" : "No") : "No disponible"}</div>
       `;
+
+      body.innerHTML = mainContent;
+
+      // Contenido de sistema2
+      if (participacion.sistema2) {
+        var s2 = participacion.sistema2;
+        var sistema2Content = `
+          <div class="mt-2">
+            <div style="color: #b25fac; font-weight: bold;">Información del Sistema 2:</div>
+            <ul>
+              <li style="color: #b25fac;"><strong>Nombres:</strong> ${s2.nombres || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Primer Apellido:</strong> ${s2.primerApellido || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Segundo Apellido:</strong> ${s2.segundoApellido || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Institución:</strong> ${s2.institucionDependencia?.nombre || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Puesto:</strong> ${s2.puesto?.nombre || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Nivel:</strong> ${s2.puesto?.nivel || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Nivel de Responsabilidad:</strong> ${s2.nivelResponsabilidad?.map(nr => nr.valor).join(", ") || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Tipo de Procedimiento:</strong> ${s2.tipoProcedimiento?.map(tp => tp.valor).join(", ") || "No disponible"}</li>
+            </ul>
+          </div>
+        `;
+        body.innerHTML += sistema2Content;
+      }
 
       collapse.appendChild(body);
 
@@ -310,7 +349,6 @@ function updateParticipacionesDetails(d) {
     // Agregar el accordion al div de detalles
     detalleDiv.appendChild(accordion);
 
-    // No es necesario inicializar manualmente el accordion en Bootstrap 5
   } else {
     detalleDiv.innerHTML = "<p>No hay detalles de participaciones disponibles.</p>";
   }
