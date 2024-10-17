@@ -175,57 +175,76 @@ function renderTreemap(transformedData) {
       
     </div>`
     })
+    .loadingMessage(true)
+    .loadingHTML(() => {
+      return `<div style="left: 50%; top: 50%; position: absolute; transform: translate(-50%, -50%);">
+        <i class="fa fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+        <h4 class="mb-3">Cargando información...</h4>     
+    </div>`
+    })
     .legend(false)
     .tooltipConfig({
+      background: "rgba(255, 255, 255, 0.9)",
+      border: "2px solid #ddd",
+      borderRadius: "0px",
+      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+      fontSize: "12px",
+      padding: "10px",
       tbody: function (d) {
         let rows = [];
         if (d.children && d.children.length > 0) {
-          rows.push(["Participaciones", d.value.toLocaleString()]);
-          rows.push(["RFC", d.rfc || "No disponible"]);
-        } else {
-          // Si existe d.tender, agregar sus datos
-          if (d.tender) {
-            rows.push([
-              "Título de la licitación",
-              d.tenderTitle || "No disponible"
-            ]);
-            rows.push([
-              "Periodo de licitación - Fecha de Inicio",
-              d.tender.tenderPeriod
-                ? d.tender.tenderPeriod.startDate || "No disponible"
-                : "No disponible",
-            ]);
-            rows.push([
-              "Periodo de evaluación y adjudicación - Fecha de Término",
-              d.tender.awardPeriod
-                ? d.tender.awardPeriod.endDate || "No disponible"
-                : "No disponible",
-            ]);
-            rows.push([
-              "Método de Contratación",
-              d.tender.procurementMethod || "No disponible",
-            ]);
-            rows.push([
-              "Nombre del actor",
-              d.tender.procuringEntity
-                ? d.tender.procuringEntity.name || "No disponible"
-                : "No disponible",
-            ]);
-            rows.push([
-              "Estatus de la licitación",
-              d.tender.status || "No disponible",
-            ]);
-            // Agregar los requestingUnits si existen
-            if (d.planning && Array.isArray(d.planning.requestingUnits)) {
-              //rows.push(["Áreas Requirentes", ""]); // Encabezado
-              d.planning.requestingUnits.forEach((unit, index) => {
-                rows.push([index === 0 ? `Área Requirente (${index + 1})` : "", unit.name || "No disponible"]);
-              });
-            }
+          rows.push([
+            "<strong style='color: #333; float: left; margin-right: 5px;'>Participaciones:</strong>",
+            `<span style='color: #007bff; float: left;'>${d.value.toLocaleString()}</span>`
+          ]);
+          rows.push([
+            "<strong style='color: #333; float: left; '>RFC:</strong>",
+            `<span style='color: #28a745; float: left;'>${d.rfc || "No disponible"}</span>`
+          ]);
+        } else if (d.tender) {
+          rows = [
+            [
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Título de la licitación:</strong>",
+              `<span style='color: #007bff; float: left;'>${d.tenderTitle || "No disponible"}</span>`
+            ],
+            [
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Periodo de licitación - Fecha de Inicio:</strong>",
+              `<span style='color: #28a745; float: left;'>${d.tender.tenderPeriod ? d.tender.tenderPeriod.startDate || "No disponible" : "No disponible"}</span>`
+            ],
+            [
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Periodo de evaluación y adjudicación - Fecha de Término:</strong>",
+              `<span style='color: #28a745; float: left;'>${d.tender.awardPeriod ? d.tender.awardPeriod.endDate || "No disponible" : "No disponible"}</span>`
+            ],
+            [
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Método de Contratación:</strong>",
+              `<span style='color: #6c757d; float: left;'>${d.tender.procurementMethod || "No disponible"}</span>`
+            ],
+            [
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Nombre del actor:</strong>",
+              `<span style='color: #17a2b8; float: left;'>${d.tender.procuringEntity ? d.tender.procuringEntity.name || "No disponible" : "No disponible"}</span>`
+            ],
+            [
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Estatus de la licitación:</strong>",
+              `<span style='color: #ffc107; float: left;'>${d.tender.status || "No disponible"}</span>`
+            ]
+          ];
+
+          if (d.planning && Array.isArray(d.planning.requestingUnits)) {
+            d.planning.requestingUnits.forEach((unit, index) => {
+              rows.push([
+                `<strong style='color: #333; float: left; margin-right: 5px;'>${index === 0 ? `Área Requirente (${index + 1}):` : ""}</strong>`,
+                `<span style='color: #6610f2; float: left;'>${unit.name || "No disponible"}</span>`
+              ]);
+            });
           }
         }
         return rows;
       },
+      title: function (d) {
+        return `<div style='font-size: 14px; font-weight: bold; color: #333; margin-bottom: 10px; text-align: left; padding-bottom: 5px; width: 100%;'>
+      ${d.children ? (d.empresa || "Empresa") : (d.buyer ? d.buyer.name || "Comprador" : "Comprador")}
+    </div>`;
+      }
     })
     .on("click", function (d) {
       if (d.children && d.children.length > 0) {
