@@ -22,14 +22,20 @@ function processData(data) {
       id: sistemaIndex,
       tenderTitle: sistema6.tender.title,
       value: 1,
-      hasSistema2: empresa.participaciones.some((p) => p.sistema2),
+      hasSistema2: empresa.participaciones.some((p) =>
+        p.sistema2 &&
+        p.sistema2.institucionDependencia &&
+        p.sistema2.institucionDependencia.nombre &&
+        sistema6.buyer &&
+        sistema6.buyer.name &&
+        p.sistema2.institucionDependencia.nombre.toLowerCase() === sistema6.buyer.name.toLowerCase()
+      ),
       hasEntePublicoMatch: empresa.participaciones.some(
         (p) =>
           p.nombreEntePublico &&
           sistema6.buyer &&
           sistema6.buyer.name &&
-          p.nombreEntePublico.toLowerCase() ===
-          sistema6.buyer.name.toLowerCase()
+          p.nombreEntePublico.toLowerCase() === sistema6.buyer.name.toLowerCase()
       ),
       isSupplier: sistema6.partiesMatch.isSupplier,
     })),
@@ -61,7 +67,7 @@ function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, sear
         value: filteredChildren.length,
       };
     })
-    .filter((empresa) => empresa && empresa.children.length > 0);
+    .filter((empresa) => empresa /* && empresa.children.length > 0 */);
 }
 
 function renderTreemap(transformedData) {
@@ -89,6 +95,8 @@ function renderTreemap(transformedData) {
       );
 
       currentData = filteredData;
+      console.log(currentData)
+
       visualization.config({ data: filteredData }).render();
       backButton.style.display = "none";
       leyendaColores.style.display = "none";
@@ -106,7 +114,7 @@ function renderTreemap(transformedData) {
     .shapeConfig({
       /* fill: d => d.empresa === "IPN" ? "green" : "orange", */
       label: (d) => {
-        if (d.children && d.children.length > 0) {
+        if (d.children /* && d.children.length > 0 */) {
           return `${d.empresa}\n<b>Licitaciones:</b> ${d.value.toLocaleString()}\n<b>RFC:</b> ${d.rfc}`;
         } else {
           let label = d.buyer
@@ -127,7 +135,7 @@ function renderTreemap(transformedData) {
     .select("#chart")
     // label en title del tooltip
     .label(function (d) {
-      if (d.children && d.children.length > 0) {
+      if (d.children /* && d.children.length > 0 */) {
         return d.empresa;
       } else {
         //console.log(d)
@@ -192,7 +200,7 @@ function renderTreemap(transformedData) {
       padding: "10px",
       tbody: function (d) {
         let rows = [];
-        if (d.children && d.children.length > 0) {
+        if (d.children /* && d.children.length > 0 */) {
           rows.push([
             "<strong style='color: #333; float: left; margin-right: 5px;'>Participaciones:</strong>",
             `<span style='color: #007bff; float: left;'>${d.value.toLocaleString()}</span>`
@@ -247,7 +255,7 @@ function renderTreemap(transformedData) {
       }
     })
     .on("click", function (d) {
-      if (d.children && d.children.length > 0) {
+      if (d.children /* && d.children.length > 0 */) {
         currentData = transformedData;
         currentEmpresa = d.empresa;
         backButton.style.display = "block";
@@ -383,7 +391,7 @@ function updateParticipacionesDetails(d) {
               <li style="color: #b25fac;"><strong>Nombres:</strong> ${s2.nombres || "No disponible"}</li>
               <li style="color: #b25fac;"><strong>Primer Apellido:</strong> ${s2.primerApellido || "No disponible"}</li>
               <li style="color: #b25fac;"><strong>Segundo Apellido:</strong> ${s2.segundoApellido || "No disponible"}</li>
-              <li style="color: #b25fac;"><strong>Institución:</strong> ${s2.institucionDependencia?.nombre || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Institución: </strong><span class="badge bg-secondary"> ${s2.institucionDependencia?.nombre || "No disponible"} </span></li>
               <li style="color: #b25fac;"><strong>Puesto:</strong> ${s2.puesto?.nombre || "No disponible"}</li>
               <li style="color: #b25fac;"><strong>Nivel:</strong> ${s2.puesto?.nivel || "No disponible"}</li>
               <li style="color: #b25fac;"><strong>Nivel de Responsabilidad:</strong> ${s2.nivelResponsabilidad?.map(nr => nr.valor).join(", ") || "No disponible"}</li>
