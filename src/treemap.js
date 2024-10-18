@@ -202,7 +202,7 @@ function renderTreemap(transformedData) {
         let rows = [];
         if (d.children /* && d.children.length > 0 */) {
           rows.push([
-            "<strong style='color: #333; float: left; margin-right: 5px;'>Participaciones:</strong>",
+            "<strong style='color: #333; float: left; margin-right: 5px;'>Licitaciones:</strong>",
             `<span style='color: #007bff; float: left;'>${d.value.toLocaleString()}</span>`
           ]);
           rows.push([
