@@ -67,7 +67,7 @@ function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, sear
         value: filteredChildren.length,
       };
     })
-    .filter((empresa) => empresa /* && empresa.children.length > 0 */);
+    .filter((empresa) => empresa && empresa.children.length > 0);
 }
 
 function renderTreemap(transformedData) {
