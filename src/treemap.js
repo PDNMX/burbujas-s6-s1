@@ -290,12 +290,79 @@ function renderTreemap(transformedData) {
   backButton.addEventListener("click", function () {
     applyFilters();
   });
-
+  function initializeClearFilters() {
+    // Crear el botón si no existe en el HTML
+    let clearFiltersBtn = document.getElementById('clearFiltersBtn');
+     
+    function clearAllFilters() {
+      const searchInput = document.getElementById("searchInput");
+      const supplierCheckbox = document.getElementById("supplierFilter");
+      const sistema2Checkbox = document.getElementById("sistema2Filter");
+      const entePublicoCheckbox = document.getElementById("entePublicoFilter");
+  
+      // Limpiar todos los filtros
+      searchInput.value = "";
+      supplierCheckbox.checked = false;
+      sistema2Checkbox.checked = false;
+      entePublicoCheckbox.checked = false;
+  
+      // Ocultar spinner de búsqueda si está visible
+      const loadingSpinner = document.getElementById("loadingSpinner");
+      if (loadingSpinner) {
+        loadingSpinner.style.display = "none";
+      }
+  
+      // Restablecer estado global
+      currentEmpresa = "";
+      
+      // Aplicar los filtros
+      if (typeof applyFilters === 'function') {
+        applyFilters();
+      }
+  
+      updateClearFiltersVisibility();
+    }
+  
+    function updateClearFiltersVisibility() {
+      const searchInput = document.getElementById("searchInput");
+      const supplierCheckbox = document.getElementById("supplierFilter");
+      const sistema2Checkbox = document.getElementById("sistema2Filter");
+      const entePublicoCheckbox = document.getElementById("entePublicoFilter");
+  
+      const hasActiveFilters = searchInput.value !== "" || 
+                             supplierCheckbox.checked || 
+                             sistema2Checkbox.checked || 
+                             entePublicoCheckbox.checked;
+  
+      clearFiltersBtn.style.opacity = hasActiveFilters ? "1" : "0.5";
+      clearFiltersBtn.disabled = !hasActiveFilters;
+    }
+  
+    // Agregar event listeners
+    const inputs = [
+      document.getElementById("searchInput"),
+      document.getElementById("supplierFilter"),
+      document.getElementById("sistema2Filter"),
+      document.getElementById("entePublicoFilter")
+    ];
+  
+    inputs.forEach(input => {
+      if (input) {
+        input.addEventListener(input.type === 'text' ? 'input' : 'change', updateClearFiltersVisibility);
+      }
+    });
+  
+    clearFiltersBtn.addEventListener('click', clearAllFilters);
+    updateClearFiltersVisibility();
+  }
   supplierCheckbox.addEventListener("change", debouncedApplyFilters);
   sistema2Checkbox.addEventListener("change", debouncedApplyFilters);
   entePublicoCheckbox.addEventListener("change", debouncedApplyFilters);
   searchInput.addEventListener("input", debouncedApplyFilters);
+  initializeClearFilters();
 }
+
+
 
 function updateParticipacionesDetails(d) {
   var detalleDiv = document.getElementById("detalleParticipaciones");

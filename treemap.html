@@ -33,7 +33,8 @@
         <div class="row mb-3">
             <div class="col-12 text-center">
                 <div class="input-group input-group-lg">
-                    <span class="input-group-text border-end-0 bg-white"><i class="fa fa-search" aria-hidden="true"></i></span>
+                    <span class="input-group-text border-end-0 bg-white"><i class="fa fa-search"
+                            aria-hidden="true"></i></span>
                     <input type="text" id="searchInput" class="form-control border-start-0"
                         placeholder="Buscar por nombre de la empresa o RFC de la empresa">
                     <span class="input-group-text loading" id="loadingSpinner">
@@ -64,12 +65,20 @@
                     Coincide el Ente Público del Declarante
                     <strong>(⚑)</strong>
                 </label>
+
             </div>
-            <div class="col-md-2 col-xs-12 d-flex flex-column justify-content-end align-items-end p-0 m-0">
-                <button id="backButton" type="button" class="btn btn-primary mt-2">
-                    <i class="fa fa-arrow-left" aria-hidden="true"></i> Regresar
+
+            <div class="col-md-2 col-xs-12 d-flex flex-column gap-2 align-items-stretch">
+                <button id="backButton" type="button" class="btn btn-primary btn-sm w-100">
+                    <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
+                    <span>Regresar</span>
+                </button>
+                <button id="clearFiltersBtn" type="button" class="btn btn-primary btn-sm w-100" disabled>
+                    <i class="fa fa-trash me-2"></i>
+                    <span>Quitar filtros</span>
                 </button>
             </div>
+
         </div>
         <div class="row text-center">
             <div class="col-12">
