@@ -373,7 +373,7 @@ function updateParticipacionesDetails(d) {
         <div><strong>Fecha de posesión:</strong> ${participacion.fechaTomaPosesion || "No disponible"}</div>
         <div><strong>Contratado por honorarios:</strong> ${participacion.contratadoPorHonorarios !== undefined ? (participacion.contratadoPorHonorarios ? "Sí" : "No") : "No disponible"}</div>
         <div><strong>Área de adscripción:</strong> ${participacion.areaAdscripcion || "No disponible"}</div>
-        <div><strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? participacion.porcentajeParticipacion + "%" : "No disponible"}</div>
+        <div><strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? (participacion.porcentajeParticipacion >= 50 ? `<span class="badge bg-danger">${participacion.porcentajeParticipacion}%</span>` : `${participacion.porcentajeParticipacion}%` ) : "No disponible"} </div>        
         <div><strong>Recibe remuneración:</strong> ${participacion.recibeRemuneracion !== undefined ? (participacion.recibeRemuneracion ? "Sí" : "No") : "No disponible"}</div>
         <div><strong>Tipo de participación:</strong> ${participacion.tipoParticipacion || "No disponible"}</div>
         <div><strong>Sector de participación:</strong> ${participacion.sectorParticipacion || "No disponible"}</div>
