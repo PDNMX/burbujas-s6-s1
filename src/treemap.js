@@ -575,7 +575,7 @@ function updateParticipacionesDetails(d) {
       body.innerHTML = mainContent;
 
       // Contenido de sistema2 con resaltado
-      if (participacion.sistema2) {
+      /* if (participacion.sistema2) {
         var s2 = participacion.sistema2;
         var sistema2Content = `
           <div class="mt-2">
@@ -593,7 +593,7 @@ function updateParticipacionesDetails(d) {
           </div>
         `;
         body.innerHTML += sistema2Content;
-      }
+      } */
 
       collapse.appendChild(body);
       accordionItem.appendChild(header);
