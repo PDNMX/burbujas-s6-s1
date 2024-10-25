@@ -32,39 +32,55 @@
         </div>
         <div class="row mb-3">
             <div class="col-12 text-center">
-                <div class="input-group input-group-lg">
-                    <span class="input-group-text border-end-0 bg-white"><i class="fa fa-search"
-                            aria-hidden="true"></i></span>
-                    <input type="text" id="searchInput" class="form-control border-start-0"
-                        placeholder="Buscar por nombre de la empresa o RFC de la empresa">
-                    <span class="input-group-text loading" id="loadingSpinner">
-                        <div class="spinner-border spinner-border-sm" role="status">
-                            <span class="visually-hidden">Cargando...</span>
-                        </div>
+                <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fa fa-search"></i>
                     </span>
-                </div>
+                    <input 
+                      type="text" 
+                      id="searchInput" 
+                      class="form-control" 
+                      placeholder="Buscar por nombre de empresa, RFC o nombre de servidor público"
+                      title="Puedes buscar por nombre de empresa, RFC o nombre completo del servidor público"
+                    >
+                    <span class="input-group-text loading" id="loadingSpinner">
+                      <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                      </div>
+                    </span>
+                  </div>
+                  
             </div>
         </div>
 
         <div class="row m-1">
             <div class="col-md-10 col-xs-12">
-                <label for="supplierFilter">
-                    <input type="checkbox" id="supplierFilter"> Mostrar solo Participaciones en Empresas con
-                    Licitaciones Adjudicadas
-                    <strong>(★)</strong>
-                </label>
-                <br>
-                <label for="sistema2Filter">
-                    <input type="checkbox" id="sistema2Filter"> Mostrar solo Participaciones en Empresas con Datos del
-                    Declarante del Sistema 2
-                    <strong>(✓)</strong>
-                </label>
-                <br>
-                <label for="entePublicoFilter">
-                    <input type="checkbox" id="entePublicoFilter"> Mostrar solo Participaciones en Empresas donde
-                    Coincide el Ente Público del Declarante
-                    <strong>(⚑)</strong>
-                </label>
+
+                <div class="form-check form-check-inline">
+                    <label for="supplierFilter">
+                        <input class="form-check-input" type="checkbox" id="supplierFilter"> Mostrar solo Participaciones en Empresas con
+                        Licitaciones Adjudicadas
+                        <strong>(★)</strong>
+                    </label>
+                    <br>
+                    <label for="sistema2Filter">
+                        <input class="form-check-input" type="checkbox" id="sistema2Filter"> Mostrar solo Participaciones en Empresas con Datos
+                        del
+                        Declarante del Sistema 2
+                        <strong>(✓)</strong>
+                    </label>
+                    <br>
+                    <label for="entePublicoFilter">
+                        <input class="form-check-input" type="checkbox" id="entePublicoFilter"> Mostrar solo Participaciones en Empresas donde
+                        Coincide el Ente Público del Declarante
+                        <strong>(⚑)</strong>
+                    </label>
+                    <br>
+                    <input class="form-check-input" type="checkbox" id="buyerProcuringFilter">
+                    <label class="form-check-label" for="buyerProcuringFilter">
+                        Coincidencia Buyer/Procuring
+                    </label>
+                </div>
 
             </div>
 

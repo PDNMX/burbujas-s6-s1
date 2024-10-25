@@ -11,6 +11,7 @@ const childColors = {
 };
 
 // Función para transformar los datos
+// Función processData actualizada
 function processData(data) {
   return data.map((empresa) => ({
     ...empresa,
@@ -38,6 +39,14 @@ function processData(data) {
           p.nombreEntePublico.toLowerCase() === sistema6.buyer.name.toLowerCase()
       ),
       isSupplier: sistema6.partiesMatch.isSupplier,
+      // Nueva validación simplificada para el objeto buyerAndProcuringEntities
+      hasBuyerProcuringMatch: sistema6.buyerAndProcuringEntities &&
+        sistema6.buyerAndProcuringEntities.buyer &&
+        sistema6.buyerAndProcuringEntities.buyer.name &&
+        sistema6.buyerAndProcuringEntities.procuringEntity &&
+        sistema6.buyerAndProcuringEntities.procuringEntity.name &&
+        sistema6.buyerAndProcuringEntities.buyer.name.toLowerCase() ===
+        sistema6.buyerAndProcuringEntities.procuringEntity.name.toLowerCase()
     })),
   }));
 }
@@ -45,12 +54,25 @@ function processData(data) {
 
 
 // Función para filtrar los datos
-function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, searchTerm = '') {
+function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, onlyBuyerProcuringMatch, searchTerm = '') {
   currentEmpresa = "";
   return data
     .map((empresa) => {
-      if (searchTerm && !empresa.nombreEmpresa.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !empresa.rfc.toLowerCase().includes(searchTerm.toLowerCase())) {
+      // Convertir searchTerm a minúsculas una sola vez
+      const searchTermLower = searchTerm.toLowerCase();
+
+      // Buscar en nombreEmpresa y RFC
+      const matchesEmpresa = empresa.nombreEmpresa.toLowerCase().includes(searchTermLower);
+      const matchesRFC = empresa.rfc.toLowerCase().includes(searchTermLower);
+
+      // Buscar en participaciones (nombreCompleto)
+      const matchesParticipante = empresa.participaciones.some(participacion => {
+        const nombreCompleto = `${participacion.nombre || ''} ${participacion.primerApellido || ''} ${participacion.segundoApellido || ''}`.trim().toLowerCase();
+        return nombreCompleto.includes(searchTermLower);
+      });
+
+      // Si hay término de búsqueda y no hay coincidencias, retornar null
+      if (searchTerm && !matchesEmpresa && !matchesRFC && !matchesParticipante) {
         return null;
       }
 
@@ -58,6 +80,7 @@ function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, sear
         if (onlySistema2 && !child.hasSistema2) return false;
         if (onlyEntePublicoMatch && !child.hasEntePublicoMatch) return false;
         if (onlySupplier && !child.isSupplier) return false;
+        if (onlyBuyerProcuringMatch && !child.hasBuyerProcuringMatch) return false;
         return true;
       });
 
@@ -76,6 +99,7 @@ function renderTreemap(transformedData) {
   const supplierCheckbox = document.getElementById("supplierFilter");
   const sistema2Checkbox = document.getElementById("sistema2Filter");
   const entePublicoCheckbox = document.getElementById("entePublicoFilter");
+  const buyerProcuringCheckbox = document.getElementById("buyerProcuringFilter"); // Nuevo checkbox
   const cardDetalleParticipaciones = document.getElementById("cardDetalleParticipaciones");
   const searchInput = document.getElementById("searchInput");
   const loadingSpinner = document.getElementById("loadingSpinner");
@@ -91,6 +115,7 @@ function renderTreemap(transformedData) {
         sistema2Checkbox.checked,
         entePublicoCheckbox.checked,
         supplierCheckbox.checked,
+        buyerProcuringCheckbox.checked,
         searchInput.value
       );
 
@@ -200,7 +225,7 @@ function renderTreemap(transformedData) {
       padding: "10px",
       tbody: function (d) {
         let rows = [];
-        if (d.children /* && d.children.length > 0 */) {
+        if (d.children) {
           rows.push([
             "<strong style='color: #333; float: left; margin-right: 5px;'>Licitaciones:</strong>",
             `<span style='color: #007bff; float: left;'>${d.value.toLocaleString()}</span>`
@@ -210,6 +235,7 @@ function renderTreemap(transformedData) {
             `<span style='color: #28a745; float: left;'>${d.rfc || "No disponible"}</span>`
           ]);
         } else if (d.tender) {
+          // Información existente del tender
           rows = [
             [
               "<strong style='color: #333; float: left; margin-right: 5px;'>Título de la licitación:</strong>",
@@ -228,7 +254,7 @@ function renderTreemap(transformedData) {
               `<span style='color: #6c757d; float: left;'>${d.tender.procurementMethod || "No disponible"}</span>`
             ],
             [
-              "<strong style='color: #333; float: left; margin-right: 5px;'>Nombre del actor:</strong>",
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Entidad contratante:</strong>",
               `<span style='color: #17a2b8; float: left;'>${d.tender.procuringEntity ? d.tender.procuringEntity.name || "No disponible" : "No disponible"}</span>`
             ],
             [
@@ -237,6 +263,40 @@ function renderTreemap(transformedData) {
             ]
           ];
 
+          // Agregar información de awards si existe
+          if (d.awards && Array.isArray(d.awards)) {
+
+            // Información de cada award
+            d.awards.forEach((award, index) => {
+              // Monto y moneda
+              if (award.value) {
+                rows.push([
+                  `<strong style='color: #333; float: left; margin-right: 5px;'>Monto adjudicado ${index + 1}:</strong>`,
+                  `<span style='color: #6c757d; float: left;'>${award.value.amount?.toLocaleString() || "No disponible"} ${award.value.currency || ""}</span>`
+                ]);
+              }
+
+              // Status del award
+              /* if (award.status) {
+                rows.push([
+                  `<strong style='color: #333; float: left; margin-right: 5px;'>Estado de adjudicación ${index + 1}:</strong>`,
+                  `<span style='color: #fd7e14; float: left;'>${award.status}</span>`
+                ]);
+              }
+    
+              // Información de suppliers
+              if (award.suppliers && Array.isArray(award.suppliers)) {
+                award.suppliers.forEach((supplier, supplierIndex) => {
+                  rows.push([
+                    `<strong style='color: #333; float: left; margin-right: 5px;'>Proveedor ${index + 1}.${supplierIndex + 1}:</strong>`,
+                    `<span style='color: #20c997; float: left;'>${supplier.name || "No disponible"} (ID: ${supplier.id || "No disponible"})</span>`
+                  ]);
+                });
+              } */
+            });
+          }
+
+          // Información de requestingUnits
           if (d.planning && Array.isArray(d.planning.requestingUnits)) {
             d.planning.requestingUnits.forEach((unit, index) => {
               rows.push([
@@ -245,13 +305,33 @@ function renderTreemap(transformedData) {
               ]);
             });
           }
+
+          // En la configuración del tooltip, dentro de la función tbody
+          if (d.buyerAndProcuringEntities) {
+
+            // Información del Buyer
+            if (d.buyerAndProcuringEntities.buyer) {
+              rows.push([
+                "<strong style='color: #333; float: left; margin-right: 5px;'>Buyer:</strong>",
+                `<span style='color: #20c997; float: left;'>${d.buyerAndProcuringEntities.buyer.name || "No disponible"}</span>`
+              ]);
+            }
+
+            // Información del Procuring Entity
+            if (d.buyerAndProcuringEntities.procuringEntity) {
+              rows.push([
+                "<strong style='color: #333; float: left; margin-right: 5px;'>Procuring Entity:</strong>",
+                `<span style='color: #20c997; float: left;'>${d.buyerAndProcuringEntities.procuringEntity.name || "No disponible"}</span>`
+              ]);
+            }
+          }
         }
         return rows;
       },
       title: function (d) {
         return `<div style='font-size: 14px; font-weight: bold; color: #333; margin-bottom: 10px; text-align: left; padding-bottom: 5px; width: 100%;'>
-      ${d.children ? (d.empresa || "Empresa") : (d.buyer ? d.buyer.name || "Comprador" : "Comprador")}
-    </div>`;
+          ${d.children ? (d.empresa || "Empresa") : (d.buyer ? d.buyer.name || "Comprador" : "Comprador")}
+        </div>`;
       }
     })
     .on("click", function (d) {
@@ -293,51 +373,51 @@ function renderTreemap(transformedData) {
   function initializeClearFilters() {
     // Crear el botón si no existe en el HTML
     let clearFiltersBtn = document.getElementById('clearFiltersBtn');
-     
+
     function clearAllFilters() {
       const searchInput = document.getElementById("searchInput");
       const supplierCheckbox = document.getElementById("supplierFilter");
       const sistema2Checkbox = document.getElementById("sistema2Filter");
       const entePublicoCheckbox = document.getElementById("entePublicoFilter");
-  
+
       // Limpiar todos los filtros
       searchInput.value = "";
       supplierCheckbox.checked = false;
       sistema2Checkbox.checked = false;
       entePublicoCheckbox.checked = false;
-  
+
       // Ocultar spinner de búsqueda si está visible
       const loadingSpinner = document.getElementById("loadingSpinner");
       if (loadingSpinner) {
         loadingSpinner.style.display = "none";
       }
-  
+
       // Restablecer estado global
       currentEmpresa = "";
-      
+
       // Aplicar los filtros
       if (typeof applyFilters === 'function') {
         applyFilters();
       }
-  
+
       updateClearFiltersVisibility();
     }
-  
+
     function updateClearFiltersVisibility() {
       const searchInput = document.getElementById("searchInput");
       const supplierCheckbox = document.getElementById("supplierFilter");
       const sistema2Checkbox = document.getElementById("sistema2Filter");
       const entePublicoCheckbox = document.getElementById("entePublicoFilter");
-  
-      const hasActiveFilters = searchInput.value !== "" || 
-                             supplierCheckbox.checked || 
-                             sistema2Checkbox.checked || 
-                             entePublicoCheckbox.checked;
-  
+
+      const hasActiveFilters = searchInput.value !== "" ||
+        supplierCheckbox.checked ||
+        sistema2Checkbox.checked ||
+        entePublicoCheckbox.checked;
+
       clearFiltersBtn.style.opacity = hasActiveFilters ? "1" : "0.5";
       clearFiltersBtn.disabled = !hasActiveFilters;
     }
-  
+
     // Agregar event listeners
     const inputs = [
       document.getElementById("searchInput"),
@@ -345,13 +425,13 @@ function renderTreemap(transformedData) {
       document.getElementById("sistema2Filter"),
       document.getElementById("entePublicoFilter")
     ];
-  
+
     inputs.forEach(input => {
       if (input) {
         input.addEventListener(input.type === 'text' ? 'input' : 'change', updateClearFiltersVisibility);
       }
     });
-  
+
     clearFiltersBtn.addEventListener('click', clearAllFilters);
     updateClearFiltersVisibility();
   }
@@ -359,14 +439,31 @@ function renderTreemap(transformedData) {
   sistema2Checkbox.addEventListener("change", debouncedApplyFilters);
   entePublicoCheckbox.addEventListener("change", debouncedApplyFilters);
   searchInput.addEventListener("input", debouncedApplyFilters);
+  buyerProcuringCheckbox.addEventListener("change", debouncedApplyFilters);
   initializeClearFilters();
 }
 
 
 
+// Función auxiliar para resaltar texto
+function highlightText(text, searchTerm) {
+  if (!searchTerm || !text) return text || "No disponible";
+  const searchTermLower = searchTerm.toLowerCase();
+  const textLower = text.toLowerCase();
+  const index = textLower.indexOf(searchTermLower);
+  
+  if (index >= 0) {
+    return text.slice(0, index) + 
+           `<mark class="bg-success text-white">${text.slice(index, index + searchTerm.length)}</mark>` + 
+           text.slice(index + searchTerm.length);
+  }
+  return text;
+}
+
 function updateParticipacionesDetails(d) {
   var detalleDiv = document.getElementById("detalleParticipaciones");
   detalleDiv.innerHTML = "";
+  const searchTerm = document.getElementById("searchInput").value;
 
   if (d.participaciones) {
     let participaciones = Array.isArray(d.participaciones)
@@ -389,7 +486,7 @@ function updateParticipacionesDetails(d) {
     // Crear el contenedor del accordion
     var accordion = document.createElement("div");
     accordion.className = "accordion accordion-flush";
-    var accordionId = "participacionesAccordion" + Date.now(); // ID único
+    var accordionId = "participacionesAccordion" + Date.now();
     accordion.id = accordionId;
 
     participaciones.forEach(function (participacion, index) {
@@ -417,9 +514,11 @@ function updateParticipacionesDetails(d) {
       icon.className = "fa fa-user fa-fw me-2";
       button.appendChild(icon);
 
-      // Añadir texto
+      // Añadir texto con resaltado
       var textSpan = document.createElement("span");
-      textSpan.innerHTML = `${participacion.nombre || ""} ${participacion.primerApellido || ""} ${participacion.segundoApellido || ""} - ${participacion.nombreEntePublico || "Ente no disponible"}`;
+      const nombreCompleto = `${participacion.nombre || ""} ${participacion.primerApellido || ""} ${participacion.segundoApellido || ""}`.trim();
+      const entePublico = participacion.nombreEntePublico || "Ente no disponible";
+      textSpan.innerHTML = `${highlightText(nombreCompleto, searchTerm)} - ${highlightText(entePublico, searchTerm)}`;
       button.appendChild(textSpan);
 
       header.appendChild(button);
@@ -434,13 +533,13 @@ function updateParticipacionesDetails(d) {
       var body = document.createElement("div");
       body.className = "accordion-body";
 
-      // Contenido principal
+      // Contenido principal con resaltado
       var mainContent = `
-        <div><strong>Cargo:</strong> ${participacion.empleoCargoComision || "No disponible"}</div>
+        <div><strong>Cargo:</strong> ${highlightText(participacion.empleoCargoComision || "No disponible", searchTerm)}</div>
         <div><strong>Fecha de posesión:</strong> ${participacion.fechaTomaPosesion || "No disponible"}</div>
         <div><strong>Contratado por honorarios:</strong> ${participacion.contratadoPorHonorarios !== undefined ? (participacion.contratadoPorHonorarios ? "Sí" : "No") : "No disponible"}</div>
-        <div><strong>Área de adscripción:</strong> ${participacion.areaAdscripcion || "No disponible"}</div>
-        <div><strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? (participacion.porcentajeParticipacion >= 50 ? `<span class="badge bg-danger">${participacion.porcentajeParticipacion}%</span>` : `${participacion.porcentajeParticipacion}%` ) : "No disponible"} </div>        
+        <div><strong>Área de adscripción:</strong> ${highlightText(participacion.areaAdscripcion || "No disponible", searchTerm)}</div>
+        <div><strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? (participacion.porcentajeParticipacion >= 50 ? `<span class="badge bg-danger">${participacion.porcentajeParticipacion}%</span>` : `${participacion.porcentajeParticipacion}%`) : "No disponible"}</div>
         <div><strong>Recibe remuneración:</strong> ${participacion.recibeRemuneracion !== undefined ? (participacion.recibeRemuneracion ? "Sí" : "No") : "No disponible"}</div>
         <div><strong>Tipo de participación:</strong> ${participacion.tipoParticipacion || "No disponible"}</div>
         <div><strong>Sector de participación:</strong> ${participacion.sectorParticipacion || "No disponible"}</div>
@@ -448,18 +547,18 @@ function updateParticipacionesDetails(d) {
 
       body.innerHTML = mainContent;
 
-      // Contenido de sistema2
+      // Contenido de sistema2 con resaltado
       if (participacion.sistema2) {
         var s2 = participacion.sistema2;
         var sistema2Content = `
           <div class="mt-2">
             <div style="color: #b25fac; font-weight: bold;">Información del Sistema 2:</div>
             <ul>
-              <li style="color: #b25fac;"><strong>Nombres:</strong> ${s2.nombres || "No disponible"}</li>
-              <li style="color: #b25fac;"><strong>Primer Apellido:</strong> ${s2.primerApellido || "No disponible"}</li>
-              <li style="color: #b25fac;"><strong>Segundo Apellido:</strong> ${s2.segundoApellido || "No disponible"}</li>
-              <li style="color: #b25fac;"><strong>Institución: </strong><span class="badge bg-secondary"> ${s2.institucionDependencia?.nombre || "No disponible"} </span></li>
-              <li style="color: #b25fac;"><strong>Puesto:</strong> ${s2.puesto?.nombre || "No disponible"}</li>
+              <li style="color: #b25fac;"><strong>Nombres:</strong> ${highlightText(s2.nombres || "No disponible", searchTerm)}</li>
+              <li style="color: #b25fac;"><strong>Primer Apellido:</strong> ${highlightText(s2.primerApellido || "No disponible", searchTerm)}</li>
+              <li style="color: #b25fac;"><strong>Segundo Apellido:</strong> ${highlightText(s2.segundoApellido || "No disponible", searchTerm)}</li>
+              <li style="color: #b25fac;"><strong>Institución:</strong> <span class="badge bg-secondary">${highlightText(s2.institucionDependencia?.nombre || "No disponible", searchTerm)}</span></li>
+              <li style="color: #b25fac;"><strong>Puesto:</strong> ${highlightText(s2.puesto?.nombre || "No disponible", searchTerm)}</li>
               <li style="color: #b25fac;"><strong>Nivel:</strong> ${s2.puesto?.nivel || "No disponible"}</li>
               <li style="color: #b25fac;"><strong>Nivel de Responsabilidad:</strong> ${s2.nivelResponsabilidad?.map(nr => nr.valor).join(", ") || "No disponible"}</li>
               <li style="color: #b25fac;"><strong>Tipo de Procedimiento:</strong> ${s2.tipoProcedimiento?.map(tp => tp.valor).join(", ") || "No disponible"}</li>
@@ -470,18 +569,12 @@ function updateParticipacionesDetails(d) {
       }
 
       collapse.appendChild(body);
-
-      // Agregar el encabezado y el cuerpo al item del accordion
       accordionItem.appendChild(header);
       accordionItem.appendChild(collapse);
-
-      // Agregar el item al accordion
       accordion.appendChild(accordionItem);
     });
 
-    // Agregar el accordion al div de detalles
     detalleDiv.appendChild(accordion);
-
   } else {
     detalleDiv.innerHTML = "<p>No hay detalles de participaciones disponibles.</p>";
   }
