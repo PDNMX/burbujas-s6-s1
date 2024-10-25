@@ -11,13 +11,16 @@ const childColors = {
 };
 
 // Función para transformar los datos
-// Función processData actualizada
 function processData(data) {
   return data.map((empresa) => ({
     ...empresa,
     empresa: empresa.nombreEmpresa,
     rfc: empresa.rfc,
     value: empresa.sistema6.length,
+    // Agregar el flag para participación alta
+    hasHighParticipation: empresa.participaciones.some(
+      participacion => participacion.porcentajeParticipacion >= 50
+    ),
     children: empresa.sistema6.map((sistema6, sistemaIndex) => ({
       ...sistema6,
       id: sistemaIndex,
@@ -39,7 +42,6 @@ function processData(data) {
           p.nombreEntePublico.toLowerCase() === sistema6.buyer.name.toLowerCase()
       ),
       isSupplier: sistema6.partiesMatch.isSupplier,
-      // Nueva validación simplificada para el objeto buyerAndProcuringEntities
       hasBuyerProcuringMatch: sistema6.buyerAndProcuringEntities &&
         sistema6.buyerAndProcuringEntities.buyer &&
         sistema6.buyerAndProcuringEntities.buyer.name &&
@@ -51,10 +53,8 @@ function processData(data) {
   }));
 }
 
-
-
 // Función para filtrar los datos
-function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, onlyBuyerProcuringMatch, searchTerm = '') {
+function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, onlyBuyerProcuringMatch, onlyHighParticipation, searchTerm = '') {
   currentEmpresa = "";
   return data
     .map((empresa) => {
@@ -71,8 +71,18 @@ function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, only
         return nombreCompleto.includes(searchTermLower);
       });
 
+      // Verificar si hay participaciones mayores al 50%
+      const hasHighParticipation = empresa.participaciones.some(
+        participacion => participacion.porcentajeParticipacion > 50
+      );
+
       // Si hay término de búsqueda y no hay coincidencias, retornar null
       if (searchTerm && !matchesEmpresa && !matchesRFC && !matchesParticipante) {
+        return null;
+      }
+
+      // Si se requiere alta participación y no la tiene, retornar null
+      if (onlyHighParticipation && !hasHighParticipation) {
         return null;
       }
 
@@ -101,6 +111,7 @@ function renderTreemap(transformedData) {
   const entePublicoCheckbox = document.getElementById("entePublicoFilter");
   const buyerProcuringCheckbox = document.getElementById("buyerProcuringFilter"); // Nuevo checkbox
   const cardDetalleParticipaciones = document.getElementById("cardDetalleParticipaciones");
+  const highParticipationCheckbox = document.getElementById("highParticipationFilter");
   const searchInput = document.getElementById("searchInput");
   const loadingSpinner = document.getElementById("loadingSpinner");
   // Función debounce para optimizar la búsqueda
@@ -108,7 +119,7 @@ function renderTreemap(transformedData) {
 
   function applyFilters() {
     loadingSpinner.style.display = "inline-block";
-
+  
     setTimeout(() => {
       const filteredData = filterData(
         allData,
@@ -116,18 +127,19 @@ function renderTreemap(transformedData) {
         entePublicoCheckbox.checked,
         supplierCheckbox.checked,
         buyerProcuringCheckbox.checked,
+        highParticipationCheckbox.checked, // Nuevo checkbox
         searchInput.value
       );
-
+  
       currentData = filteredData;
       console.log(currentData)
-
+  
       visualization.config({ data: filteredData }).render();
       backButton.style.display = "none";
       leyendaColores.style.display = "none";
       cardDetalleParticipaciones.style.display = "none";
       document.getElementById("detalleParticipaciones").innerHTML = "";
-
+  
       loadingSpinner.style.display = "none";
     }, 0);
   }
@@ -140,7 +152,7 @@ function renderTreemap(transformedData) {
       /* fill: d => d.empresa === "IPN" ? "green" : "orange", */
       label: (d) => {
         if (d.children /* && d.children.length > 0 */) {
-          return `${d.empresa}\n<b>Licitaciones:</b> ${d.value.toLocaleString()}\n<b>RFC:</b> ${d.rfc}`;
+          return `${d.hasHighParticipation ? '▲\n' : ''}${d.empresa}\n<b>Licitaciones:</b> ${d.value.toLocaleString()}\n<b>RFC:</b> ${d.rfc}`;
         } else {
           let label = d.buyer
             ? d.buyer.name || "No disponible"
@@ -379,12 +391,14 @@ function renderTreemap(transformedData) {
       const supplierCheckbox = document.getElementById("supplierFilter");
       const sistema2Checkbox = document.getElementById("sistema2Filter");
       const entePublicoCheckbox = document.getElementById("entePublicoFilter");
+      const highParticipationCheckbox = document.getElementById("highParticipationFilter");
 
       // Limpiar todos los filtros
       searchInput.value = "";
       supplierCheckbox.checked = false;
       sistema2Checkbox.checked = false;
       entePublicoCheckbox.checked = false;
+      highParticipationCheckbox.checked = false;
 
       // Ocultar spinner de búsqueda si está visible
       const loadingSpinner = document.getElementById("loadingSpinner");
@@ -408,11 +422,13 @@ function renderTreemap(transformedData) {
       const supplierCheckbox = document.getElementById("supplierFilter");
       const sistema2Checkbox = document.getElementById("sistema2Filter");
       const entePublicoCheckbox = document.getElementById("entePublicoFilter");
+      const highParticipationCheckbox = document.getElementById("highParticipationFilter");
 
       const hasActiveFilters = searchInput.value !== "" ||
         supplierCheckbox.checked ||
         sistema2Checkbox.checked ||
         entePublicoCheckbox.checked;
+        highParticipationCheckbox.checked;
 
       clearFiltersBtn.style.opacity = hasActiveFilters ? "1" : "0.5";
       clearFiltersBtn.disabled = !hasActiveFilters;
@@ -440,6 +456,7 @@ function renderTreemap(transformedData) {
   entePublicoCheckbox.addEventListener("change", debouncedApplyFilters);
   searchInput.addEventListener("input", debouncedApplyFilters);
   buyerProcuringCheckbox.addEventListener("change", debouncedApplyFilters);
+  highParticipationCheckbox.addEventListener("change", debouncedApplyFilters);
   initializeClearFilters();
 }
 
