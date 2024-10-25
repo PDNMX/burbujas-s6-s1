@@ -10,6 +10,15 @@ const childColors = {
   withSistema2: "#EF5350", // Rojo
 };
 
+// Función auxiliar para normalizar texto (eliminar acentos)
+function normalizeText(text) {
+  return text
+    ? text.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+    : "";
+}
+
 // Función para transformar los datos
 function processData(data) {
   return data.map((empresa) => ({
@@ -58,22 +67,22 @@ function filterData(data, onlySistema2, onlyEntePublicoMatch, onlySupplier, only
   currentEmpresa = "";
   return data
     .map((empresa) => {
-      // Convertir searchTerm a minúsculas una sola vez
-      const searchTermLower = searchTerm.toLowerCase();
+      // Normalizar el término de búsqueda una sola vez
+      const normalizedSearchTerm = normalizeText(searchTerm);
 
-      // Buscar en nombreEmpresa y RFC
-      const matchesEmpresa = empresa.nombreEmpresa.toLowerCase().includes(searchTermLower);
-      const matchesRFC = empresa.rfc.toLowerCase().includes(searchTermLower);
+      // Buscar en nombreEmpresa y RFC (normalizados)
+      const matchesEmpresa = normalizeText(empresa.nombreEmpresa).includes(normalizedSearchTerm);
+      const matchesRFC = normalizeText(empresa.rfc).includes(normalizedSearchTerm);
 
-      // Buscar en participaciones (nombreCompleto)
+      // Buscar en participaciones (nombreCompleto normalizado)
       const matchesParticipante = empresa.participaciones.some(participacion => {
-        const nombreCompleto = `${participacion.nombre || ''} ${participacion.primerApellido || ''} ${participacion.segundoApellido || ''}`.trim().toLowerCase();
-        return nombreCompleto.includes(searchTermLower);
+        const nombreCompleto = `${participacion.nombre || ''} ${participacion.primerApellido || ''} ${participacion.segundoApellido || ''}`.trim();
+        return normalizeText(nombreCompleto).includes(normalizedSearchTerm);
       });
 
       // Verificar si hay participaciones mayores al 50%
       const hasHighParticipation = empresa.participaciones.some(
-        participacion => participacion.porcentajeParticipacion > 50
+        participacion => participacion.porcentajeParticipacion >= 50
       );
 
       // Si hay término de búsqueda y no hay coincidencias, retornar null
@@ -461,15 +470,16 @@ function renderTreemap(transformedData) {
 }
 
 
-
 // Función auxiliar para resaltar texto
 function highlightText(text, searchTerm) {
   if (!searchTerm || !text) return text || "No disponible";
-  const searchTermLower = searchTerm.toLowerCase();
-  const textLower = text.toLowerCase();
-  const index = textLower.indexOf(searchTermLower);
+  
+  const normalizedText = normalizeText(text);
+  const normalizedSearchTerm = normalizeText(searchTerm);
+  const index = normalizedText.indexOf(normalizedSearchTerm);
   
   if (index >= 0) {
+    // Usamos el texto original para preservar los acentos en la visualización
     return text.slice(0, index) + 
            `<mark class="bg-success text-white">${text.slice(index, index + searchTerm.length)}</mark>` + 
            text.slice(index + searchTerm.length);
