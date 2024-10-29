@@ -161,7 +161,7 @@ function renderTreemap(transformedData) {
       /* fill: d => d.empresa === "IPN" ? "green" : "orange", */
       label: (d) => {
         if (d.children /* && d.children.length > 0 */) {
-          return `${d.hasHighParticipation ? '▲\n' : ''}${d.empresa}\n<b>Licitaciones:</b> ${d.value.toLocaleString()}\n<b>RFC:</b> ${d.rfc}`;
+          return `${d.hasHighParticipation ? '▲\n' : ''}${d.empresa}\n<b>Procesos de \nContratación:</b> ${d.value.toLocaleString()}\n<b>RFC:</b> ${d.rfc}`;
         } else {
           let label = d.buyer
             ? d.buyer.name || "No disponible"
@@ -248,7 +248,7 @@ function renderTreemap(transformedData) {
         let rows = [];
         if (d.children) {
           rows.push([
-            "<strong style='color: #333; float: left; margin-right: 5px;'>Licitaciones:</strong>",
+            "<strong style='color: #333; float: left; margin-right: 5px;'>Procesos de Contratación:</strong>",
             `<span style='color: #007bff; float: left;'>${d.value.toLocaleString()}</span>`
           ]);
           rows.push([
@@ -259,15 +259,15 @@ function renderTreemap(transformedData) {
           // Información existente del tender
           rows = [
             [
-              "<strong style='color: #333; float: left; margin-right: 5px;'>Título de la licitación:</strong>",
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Título del proceso de contratación:</strong>",
               `<span style='color: #007bff; float: left;'>${d.tenderTitle || "No disponible"}</span>`
             ],
             [
-              "<strong style='color: #333; float: left; margin-right: 5px;'>Periodo de licitación - Fecha de Inicio:</strong>",
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Fecha de inicio de recepción de ofertas:</strong>",
               `<span style='color: #28a745; float: left;'>${d.tender.tenderPeriod ? d.tender.tenderPeriod.startDate || "No disponible" : "No disponible"}</span>`
             ],
             [
-              "<strong style='color: #333; float: left; margin-right: 5px;'>Periodo de evaluación y adjudicación - Fecha de Término:</strong>",
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Fecha de adjudicación:</strong>",
               `<span style='color: #28a745; float: left;'>${d.tender.awardPeriod ? d.tender.awardPeriod.endDate || "No disponible" : "No disponible"}</span>`
             ],
             [
@@ -279,7 +279,7 @@ function renderTreemap(transformedData) {
               `<span style='color: #17a2b8; float: left;'>${d.tender.procuringEntity ? d.tender.procuringEntity.name || "No disponible" : "No disponible"}</span>`
             ],
             [
-              "<strong style='color: #333; float: left; margin-right: 5px;'>Estatus de la licitación:</strong>",
+              "<strong style='color: #333; float: left; margin-right: 5px;'>Estatus del proceso de contratación:</strong>",
               `<span style='color: #ffc107; float: left;'>${d.tender.status || "No disponible"}</span>`
             ]
           ];
@@ -333,7 +333,7 @@ function renderTreemap(transformedData) {
             // Información del Buyer
             if (d.buyerAndProcuringEntities.buyer) {
               rows.push([
-                "<strong style='color: #333; float: left; margin-right: 5px;'>Buyer:</strong>",
+                "<strong style='color: #333; float: left; margin-right: 5px;'>Comprador:</strong>",
                 `<span style='color: #20c997; float: left;'>${d.buyerAndProcuringEntities.buyer.name || "No disponible"}</span>`
               ]);
             }
@@ -341,7 +341,7 @@ function renderTreemap(transformedData) {
             // Información del Procuring Entity
             if (d.buyerAndProcuringEntities.procuringEntity) {
               rows.push([
-                "<strong style='color: #333; float: left; margin-right: 5px;'>Procuring Entity:</strong>",
+                "<strong style='color: #333; float: left; margin-right: 5px;'>Entidad contratante:</strong>",
                 `<span style='color: #20c997; float: left;'>${d.buyerAndProcuringEntities.procuringEntity.name || "No disponible"}</span>`
               ]);
             }
@@ -564,7 +564,6 @@ function updateParticipacionesDetails(d) {
       var mainContent = `
         <div><strong>Cargo:</strong> ${highlightText(participacion.empleoCargoComision || "No disponible", searchTerm)}</div>
         <div><strong>Fecha de posesión:</strong> ${participacion.fechaTomaPosesion || "No disponible"}</div>
-        <div><strong>Contratado por honorarios:</strong> ${participacion.contratadoPorHonorarios !== undefined ? (participacion.contratadoPorHonorarios ? "Sí" : "No") : "No disponible"}</div>
         <div><strong>Área de adscripción:</strong> ${highlightText(participacion.areaAdscripcion || "No disponible", searchTerm)}</div>
         <div><strong>Porcentaje de participación:</strong> ${participacion.porcentajeParticipacion !== undefined ? (participacion.porcentajeParticipacion >= 50 ? `<span class="badge bg-danger">${participacion.porcentajeParticipacion}%</span>` : `${participacion.porcentajeParticipacion}%`) : "No disponible"}</div>
         <div><strong>Recibe remuneración:</strong> ${participacion.recibeRemuneracion !== undefined ? (participacion.recibeRemuneracion ? "Sí" : "No") : "No disponible"}</div>
