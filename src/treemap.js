@@ -26,7 +26,6 @@ function processData(data) {
     empresa: empresa.nombreEmpresa,
     rfc: empresa.rfc,
     value: empresa.sistema6.length,
-    // Agregar el flag para participación alta
     hasHighParticipation: empresa.participaciones.some(
       participacion => participacion.porcentajeParticipacion >= 50
     ),
@@ -57,7 +56,14 @@ function processData(data) {
         sistema6.buyerAndProcuringEntities.procuringEntity &&
         sistema6.buyerAndProcuringEntities.procuringEntity.name &&
         sistema6.buyerAndProcuringEntities.buyer.name.toLowerCase() ===
-        sistema6.buyerAndProcuringEntities.procuringEntity.name.toLowerCase()
+        sistema6.buyerAndProcuringEntities.procuringEntity.name.toLowerCase() &&
+        sistema6.buyer &&
+        sistema6.buyer.name &&
+        empresa.participaciones.some(
+          (p) =>
+            p.nombreEntePublico &&
+            p.nombreEntePublico.toLowerCase() === sistema6.buyer.name.toLowerCase()
+        )
     })),
   }));
 }
@@ -272,7 +278,15 @@ function renderTreemap(transformedData) {
             ],
             [
               "<strong style='color: #333; float: left; margin-right: 5px;'>Método de Contratación:</strong>",
-              `<span style='color: #6c757d; float: left;'>${d.tender.procurementMethod || "No disponible"}</span>`
+              `<span style='color: #6c757d; float: left;'>${
+                d.tender.procurementMethod?.toLowerCase() === 'open' 
+                  ? 'Licitación' 
+                  : d.tender.procurementMethod?.toLowerCase() === 'direct' 
+                    ? 'Adjudicación directa' 
+                    : d.tender.procurementMethod?.toLowerCase() === 'selective' 
+                      ? 'Invitación a cuando menos 3' 
+                      : d.tender.procurementMethod || "No disponible"
+              }</span>`
             ],
             [
               "<strong style='color: #333; float: left; margin-right: 5px;'>Entidad contratante:</strong>",
