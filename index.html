@@ -1,93 +1,297 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Empresas con Participación de Servidores Públicos Vinculadas a
+      Contrataciones Públicas
+    </title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+      integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="css/treemap.css" />
 
-<head>
-  <meta charset="utf-8">
-  <title>PDN</title>
-  <meta name="description" content="">
-  <meta name="author" content="Sergio Rodríguez">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="css/bubble_chart.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-</head>
+    <style>
+      body {
+        background: rgb(244, 249, 249);
+      }
+    </style>
+  </head>
 
-<body>
-  <nav class="navbar bg-body-tertiary"
-    style="background: transparent linear-gradient(230deg, #1C7CBF 0%, #1C7CBF 4%, #9F58E2 49%, #6D4061 100%) 0% 0% !important; z-index: 10;">
-    <div class="container-fluid" style="max-width: 1500px !important">
-      <a class="navbar-brand" href="https://www.plataformadigitalnacional.org/">
-        <img src="./iconos/logo_pdn-transparente.svg" alt="Logo" height="32" class="d-inline-block align-text-top">
-      </a>
-    </div>
-  </nav>
-  <div class="container">
-
-    <div class="container mt-3 mb-5" style="max-width: 1500px !important">
-      <div class="row text-center mx-auto">
-        <div class="col-12">
-          <h1 style="text-align: center;">Empresas con representación de servidores públicos</h1>
-          <!-- <div id="toolbar">
-            <a href="#" id="all" class="button active">Todo</a>
-            <a href="#" id="year" class="button">Tipo de Representación</a>
-          </div> -->
-          <div id="vis"></div>
-
-        </div>
-        <div class="w-50 mx-auto">
-          <div class='my-legend'>
-            <div class='legend-title'>Tipo de representación del servidor público</div>
-            <div class='legend-scale'>
-              <ul class='legend-labels'>
-                <li><span style='background:#F1948A; text-align: "left";'></span>Accionista</li>
-                <li><span style='background:#BB8FCE;'></span>Apoderado</li>
-                <li><span style='background:#7FB3D5;'></span>Colaborador</li>
-                <li><span style='background:#73C6B6;'></span>Empleado</li>
-                <li><span style='background:#F9E79F;'></span>Representante</li>
-                <li><span style='background:#E59866;'></span>Socio</li>
-              </ul>
-            </div>
-            <!-- <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
-            </div> -->
-          </div>
-        </div>
-        <!-- <div class="footer">
-        <strong>Plataforma Digital Nacional</strong>
-      </div> -->
+  <body>
+    <nav
+      class="navbar bg-body-tertiary"
+      style="
+        background: transparent
+          linear-gradient(
+            230deg,
+            #1c7cbf 0%,
+            #1c7cbf 4%,
+            #9f58e2 49%,
+            #6d4061 100%
+          )
+          0% 0% !important;
+        z-index: 10;
+      "
+    >
+      <div class="container-fluid" style="max-width: 1700px !important">
+        <a
+          class="navbar-brand"
+          href="https://www.plataformadigitalnacional.org/"
+        >
+          <img
+            src="./iconos/logo_pdn-transparente.svg"
+            alt="Logo"
+            height="32"
+            class="d-inline-block align-text-top"
+          />
+        </a>
       </div>
+    </nav>
 
-
-    </div>
-    <!-- Modal -->
-    <div class="modal fade" id="mapaInfo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <div id="modalTitulo"><h3>Información</h3></div>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div id="divServidor">
-              <!-- generar este bloque y poner titulo como nombre de la persona y en eltexto mostrar los datos de la persona -->
+    <div class="container mt-3 mb-3" style="max-width: 1700px !important">
+      <div class="card">
+        <div class="card-body">
+          <div class="row text-center mt-4 mb-4">
+            <div class="col-12">
+              <h2 style="text-align: center">
+                Empresas con Participación de Servidores Públicos Vinculadas a
+                Contrataciones Públicas
+              </h2>
             </div>
-            <div class="accordion accordion-flush" id="accordionFlush"></div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <div class="row mb-3">
+            <div class="col-12 text-center">
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="searchInput"
+                  class="form-control"
+                  placeholder="Buscar por nombre de empresa, RFC o nombre de servidor público"
+                  title="Puedes buscar por nombre de empresa, RFC o nombre completo del servidor público"
+                />
+                <span class="input-group-text loading" id="loadingSpinner">
+                  <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                </span>
+                <span class="input-group-text">
+                  <i class="fa fa-search"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row m-1">
+            <div class="col-md-12 col-xs-12">
+              <div class="checkbox-group">
+                <div class="checkbox">
+                  <label class="checkbox-wrapper">
+                    <input
+                      type="checkbox"
+                      class="checkbox-input"
+                      id="supplierFilter"
+                    />
+                    <span class="checkbox-tile">
+                      <span class="checkbox-icon">
+                        <i class="fa fa-star fa-2x"></i>
+                      </span>
+                      <span class="checkbox-label"
+                        >Participaciones en Empresas con Contratos
+                        Adjudicados</span
+                      >
+                    </span>
+                  </label>
+                </div>
+
+                <div class="checkbox">
+                  <label class="checkbox-wrapper">
+                    <input
+                      type="checkbox"
+                      class="checkbox-input"
+                      id="sistema2Filter"
+                    />
+                    <span class="checkbox-tile">
+                      <span class="checkbox-icon">
+                        <i class="fa fa-check fa-2x"></i>
+                      </span>
+                      <span class="checkbox-label"
+                        >Participaciones en Empresas con Datos del Declarante
+                        del Sistema 2</span
+                      >
+                    </span>
+                  </label>
+                </div>
+
+                <div class="checkbox">
+                  <label class="checkbox-wrapper">
+                    <input
+                      type="checkbox"
+                      class="checkbox-input"
+                      id="entePublicoFilter"
+                    />
+                    <span class="checkbox-tile">
+                      <span class="checkbox-icon">
+                        <i class="fa fa-flag fa-2x"></i>
+                      </span>
+                      <span class="checkbox-label"
+                        >Participaciones en Empresas donde Coincide el Ente
+                        Público del Declarante</span
+                      >
+                    </span>
+                  </label>
+                </div>
+
+                <div class="checkbox">
+                  <label class="checkbox-wrapper">
+                    <input
+                      type="checkbox"
+                      class="checkbox-input"
+                      id="buyerProcuringFilter"
+                    />
+                    <span class="checkbox-tile">
+                      <span class="checkbox-icon">
+                        <i class="fa fa-exchange-alt fa-2x"></i>
+                      </span>
+                      <span class="checkbox-label"
+                        >Coincidencia entre el Contratante (Buyer) y Comprador
+                        (Procuring Entity)</span
+                      >
+                    </span>
+                  </label>
+                </div>
+
+                <div class="checkbox">
+                  <label class="checkbox-wrapper">
+                    <input
+                      type="checkbox"
+                      class="checkbox-input"
+                      id="highParticipationFilter"
+                    />
+                    <span class="checkbox-tile">
+                      <span class="checkbox-icon">
+                        <i class="fa fa-caret-up fa-4x"></i>
+                      </span>
+                      <span class="checkbox-label"
+                        >Empresas con alguna participación mayoritaria al
+                        50%</span
+                      >
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="col-md-6 col-xs-12 d-flex flex-column gap-2 align-items-stretch mx-auto"
+            >
+              <button
+                id="backButton"
+                type="button"
+                class="btn btn-primary btn-sm w-100"
+              >
+                <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
+                <span>Regresar</span>
+              </button>
+              <button
+                id="clearFiltersBtn"
+                type="button"
+                class="btn btn-primary btn-sm w-100"
+                disabled
+              >
+                <i class="fa fa-trash me-2"></i>
+                <span>Quitar filtros</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="row text-center">
+            <div class="col-12">
+              <div id="chart"></div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div id="leyendaColores">
+              <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+                <div class="col">
+                  <div class="d-flex align-items-center">
+                    <span class="color-box bg-gray me-2"></span>
+                    <small
+                      >Proceso de contratación con participación de servidor(es)
+                      público(s)</small
+                    >
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="d-flex align-items-center">
+                    <span class="color-box bg-yellow me-2"></span>
+                    <small>Contrato adjudicado</small>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="d-flex align-items-center">
+                    <span class="color-box bg-orange me-2"></span>
+                    <small
+                      >Proceso de contratación con participación de servidor(es)
+                      público(s) y coincidencia entre el ente público del S1 y
+                      S6</small
+                    >
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="d-flex align-items-center">
+                    <span class="color-box bg-red me-2"></span>
+                    <small
+                      >Proceso de contratación con participación de servidor(es)
+                      público(s) y coincidencias en el Sistema 2</small
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="card" id="cardDetalleParticipaciones">
+                <div class="card-header">
+                  Datos del (los) Servidor(es) Público(s) con Participación en
+                  la Empresa
+                </div>
+                <div class="card-body">
+                  <div
+                    id="detalleParticipaciones"
+                    style="position: relative"
+                  ></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <script src="//d3js.org/d3.v4.min.js"></script>
-    <script src="src/tooltip.js"></script>
-    <script src="src/bubble_chart.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"
-      integrity="sha512-WW8/jxkELe2CAiE4LvQfwm1rajOS8PHasCCx+knHG0gBHt8EXxS6T6tJRTGuDQVnluuAvMxWF4j8SNFDKceLFg=="
-      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
-</body>
-
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"
+      integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3plus@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="src/treemap.js"></script>
+  </body>
 </html>
