@@ -418,7 +418,7 @@ function renderTreemap(transformedData) {
             // Información del Buyer
             if (d.buyerAndProcuringEntities.buyer) {
               rows.push([
-                "<strong style='color: #5f5e6d; float: left; margin-right: 5px;'>Comprador:</strong>",
+                "<strong style='color: #5f5e6d; float: left; margin-right: 5px;'>Comprador (buyer):</strong>",
                 `<span style='color: #94638d; float: left;'>${
                   d.buyerAndProcuringEntities.buyer.name || "No disponible"
                 }</span>`,
@@ -428,7 +428,7 @@ function renderTreemap(transformedData) {
             // Información del Procuring Entity
             if (d.buyerAndProcuringEntities.procuringEntity) {
               rows.push([
-                "<strong style='color: #5f5e6d; float: left; margin-right: 5px;'>Entidad contratante:</strong>",
+                "<strong style='color: #5f5e6d; float: left; margin-right: 5px;'>Entidad contratante (procuringEntity):</strong>",
                 `<span style='color: #94638d; float: left;'>${
                   d.buyerAndProcuringEntities.procuringEntity.name ||
                   "No disponible"
