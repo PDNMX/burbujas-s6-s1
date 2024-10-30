@@ -1,163 +1,391 @@
 <!DOCTYPE html>
 <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Empresas con Participación de Servidores Públicos Vinculadas a
+      Contrataciones Públicas
+    </title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+      integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="css/treemap.css" />
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empresas con Participación de Servidores Públicos Vinculadas a Contrataciones Públicas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
-        integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="css/treemap.css">
-</head>
-
-<body>
-    <nav class="navbar bg-body-tertiary"
-        style="background: transparent linear-gradient(230deg, #1C7CBF 0%, #1C7CBF 4%, #9F58E2 49%, #6D4061 100%) 0% 0% !important; z-index: 10;">
-        <div class="container-fluid" style="max-width: 1700px !important">
-            <a class="navbar-brand" href="https://www.plataformadigitalnacional.org/">
-                <img src="./iconos/logo_pdn-transparente.svg" alt="Logo" height="32"
-                    class="d-inline-block align-text-top">
-            </a>
-        </div>
+  <body>
+    <nav
+      class="navbar bg-body-tertiary"
+      style="
+        background: transparent
+          linear-gradient(
+            230deg,
+            #1c7cbf 0%,
+            #1c7cbf 4%,
+            #9f58e2 49%,
+            #6d4061 100%
+          )
+          0% 0% !important;
+        z-index: 10;
+      "
+    >
+      <div class="container-fluid" style="max-width: 1700px !important">
+        <a
+          class="navbar-brand"
+          href="https://www.plataformadigitalnacional.org/"
+        >
+          <img
+            src="./iconos/logo_pdn-transparente.svg"
+            alt="Logo"
+            height="32"
+            class="d-inline-block align-text-top"
+          />
+        </a>
+      </div>
     </nav>
     <div class="container mt-3 mb-3" style="max-width: 1700px !important">
-        <div class="row text-center mt-4 mb-4">
-            <div class="col-12">
-                <h2 style="text-align: center;">Empresas con Participación de Servidores Públicos Vinculadas a
-                    Contrataciones Públicas</h2>
+      <div class="row text-center mt-4 mb-4">
+        <div class="col-12 title-container">
+          <h2 class="heading-with-tooltip">
+            <span class="heading-text">
+              Identificador de Empresas, Sociedades y Asociaciones con
+              Participación de Servidores Públicos vinculados con procesos de
+              contratación pública.
+              <i class="fa fa-info-circle heading-info-icon"></i>
+            </span>
+            <div class="heading-tooltip-container">
+              <div class="heading-tooltip-header">Descripción:</div>
+              <div class="heading-tooltip-body">
+                <strong class="heading-tooltip-label"
+                  >La herramienta muestra lo siguiente:</strong
+                >
+                <span class="heading-tooltip-content">
+                  <ul class="heading-tooltip-list">
+                    <li>
+                      La participación (o socio, accionista, comisario,
+                      representante, apoderado, colaborador, beneficiario u
+                      otro) que tiene la persona servidora pública en una
+                      empresa, sociedad o asociación, de conformidad con lo
+                      señalado en sus declaraciones de intereses.
+                    </li>
+                    <li>
+                      La participación de dichas personas morales en los
+                      procesos de contratación pública a nivel nacional.
+                    </li>
+                  </ul>
+                </span>
+              </div>
             </div>
+          </h2>
         </div>
-        <div class="row mb-3">
-            <div class="col-12 text-center">
-                <div class="input-group">
-                    <span class="input-group-text">
-                      <i class="fa fa-search"></i>
-                    </span>
-                    <input 
-                      type="text" 
-                      id="searchInput" 
-                      class="form-control" 
-                      placeholder="Buscar por nombre de empresa, RFC o nombre de servidor público"
-                      title="Puedes buscar por nombre de empresa, RFC o nombre completo del servidor público"
-                    >
-                    <span class="input-group-text loading" id="loadingSpinner">
-                      <div class="spinner-border spinner-border-sm" role="status">
-                        <span class="visually-hidden">Cargando...</span>
-                      </div>
-                    </span>
-                  </div>
-                  
-            </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-12 text-center">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fa fa-search"></i>
+            </span>
+            <input
+              type="text"
+              id="searchInput"
+              class="form-control"
+              placeholder="Buscar por nombre de empresa, RFC o nombre de servidor público"
+              title="Puedes buscar por nombre de empresa, RFC o nombre completo del servidor público"
+            />
+            <span class="input-group-text loading" id="loadingSpinner">
+              <div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </span>
+          </div>
         </div>
+      </div>
 
-        <div class="row m-1">
-            <div class="col-md-10 col-xs-12">
-
-                <div class="form-check form-check-inline">
-                    <label for="supplierFilter">
-                        <input class="form-check-input" type="checkbox" id="supplierFilter"> Mostrar solo Participaciones en Empresas con Contratos Adjudicados
-                        <strong>(★)</strong>
-                    </label>
-                    <br>
-                    <label for="sistema2Filter">
-                        <input class="form-check-input" type="checkbox" id="sistema2Filter"> Mostrar solo Participaciones en Empresas con Datos
-                        del
-                        Declarante del Sistema 2
-                        <strong>(✓)</strong>
-                    </label>
-                    <br>
-                    <label for="entePublicoFilter">
-                        <input class="form-check-input" type="checkbox" id="entePublicoFilter"> Mostrar solo Participaciones en Empresas donde
-                        Coincide el Ente Público del Declarante
-                        <strong>(⚑)</strong>
-                    </label>
-                    <br>
-                    <label class="form-check-label" for="buyerProcuringFilter">
-                        <input class="form-check-input" type="checkbox" id="buyerProcuringFilter">
-                        Mostrar Coincidencias entre Buyer (Contratante) y Procuring Entity (Comprador) 
-                    </label>
-                    <br>
-                    <label class="form-check-label" for="highParticipationFilter">
-                        <input class="form-check-input" type="checkbox" id="highParticipationFilter">
-                        Mostrar solo Empresas con Alguna Participación Mayoritaria al 50% <strong>(▲)</strong>
-                    </label>
+      <div class="row m-1">
+        <div class="col-md-12 col-xs-12">
+          <div class="checkbox-group">
+            <div class="checkbox">
+              <label class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  class="checkbox-input"
+                  id="supplierFilter"
+                />
+                <span class="checkbox-tile">
+                  <span class="checkbox-icon">
+                    <i class="fa fa-star fa-2x"></i>
+                  </span>
+                  <span class="checkbox-label"
+                    >Empresas, Sociedades y Asociaciones con contratos
+                    adjudicados</span
+                  >
+                </span>
+              </label>
+              <div class="custom-tooltip">
+                <div class="custom-tooltip-title">Descripción:</div>
+                <div class="custom-tooltip-content">
+                  <strong class="tooltip-label"></strong>
+                  <span class="tooltip-description">
+                    Muestra las empresas, sociedades y asociaciones que
+                    participaron en contrataciones públicas, a las cuales se les
+                    adjudicó un contrato ya sea a través del procedimiento de
+                    Licitación pública, Invitación a cuando menos tres personas
+                    o Adjudicación directa.
+                  </span>
                 </div>
-
+              </div>
             </div>
 
-            <div class="col-md-2 col-xs-12 d-flex flex-column gap-2 align-items-stretch">
-                <button id="backButton" type="button" class="btn btn-primary btn-sm w-100">
-                    <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
-                    <span>Regresar</span>
-                </button>
-                <button id="clearFiltersBtn" type="button" class="btn btn-primary btn-sm w-100" disabled>
-                    <i class="fa fa-trash me-2"></i>
-                    <span>Quitar filtros</span>
-                </button>
-            </div>
-
-        </div>
-        <div class="row text-center">
-            <div class="col-12">
-                <div id="chart"></div>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div id="leyendaColores">
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
-                    <div class="col">
-                        <div class="d-flex align-items-center">
-                            <span class="color-box bg-gray me-2"></span>
-                            <small>Proceso de contratación con participación de servidor(es) público(s)</small>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="d-flex align-items-center">
-                            <span class="color-box bg-yellow me-2"></span>
-                            <small>Contrato adjudicado</small>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="d-flex align-items-center">
-                            <span class="color-box bg-orange me-2"></span>
-                            <small>Proceso de contratación con participación de servidor(es) público(s) y coincidencia entre el ente
-                                público del S1 y S6</small>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="d-flex align-items-center">
-                            <span class="color-box bg-red me-2"></span>
-                            <small>Proceso de contratación con participación de servidor(es) público(s) y coincidencias en el Sistema
-                                2</small>
-                        </div>
-                    </div>
+            <div class="checkbox">
+              <label class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  class="checkbox-input"
+                  id="sistema2Filter"
+                />
+                <span class="checkbox-tile">
+                  <span class="checkbox-icon">
+                    <i class="fa fa-check fa-2x"></i>
+                  </span>
+                  <span class="checkbox-label"
+                    >Coincidencias con el Sistema 2 de la Plataforma Digital
+                    Nacional</span
+                  >
+                </span>
+              </label>
+              <div class="custom-tooltip">
+                <div class="custom-tooltip-title">Descripción:</div>
+                <div class="custom-tooltip-content">
+                  <strong class="tooltip-label"></strong>
+                  <span class="tooltip-description"
+                    >Muestra las coincidencias de los nombres de las personas
+                    servidoras públicas que poseen empresas, sociedades y
+                    asociaciones, que se les adjudicó un contrato, y que también
+                    intervienen en los procedimientos de contratación pública
+                    registrados en el Sistema de servidores públicos que
+                    intervengan en procedimientos de contrataciones públicas
+                    (Sistema 2) de la PDN.</span
+                  >
                 </div>
+              </div>
             </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-12">
-                <div class="card" id="cardDetalleParticipaciones">
-                    <div class="card-header">
-                        Datos del (los) Servidor(es) Público(s) con Participación en la Empresa
-                    </div>
-                    <div class="card-body">
-                        <div id="detalleParticipaciones" style="position: relative;"></div>
-                    </div>
+
+            <div class="checkbox">
+              <label class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  class="checkbox-input"
+                  id="entePublicoFilter"
+                />
+                <span class="checkbox-tile">
+                  <span class="checkbox-icon">
+                    <i class="fa fa-flag fa-2x"></i>
+                  </span>
+                  <span class="checkbox-label"
+                    >Coincidencia entre el ente público donde se realiza la
+                    contratación y donde labora la persona servidora
+                    pública.</span
+                  >
+                </span>
+              </label>
+              <div class="custom-tooltip">
+                <div class="custom-tooltip-title">Descripción:</div>
+                <div class="custom-tooltip-content">
+                  <strong class="tooltip-label"></strong>
+                  <span class="tooltip-description"
+                    >Muestra las empresas, sociedades y asociaciones que
+                    participaron en contrataciones públicas en el mismo ente
+                    público donde una persona servidora pública tiene empleo,
+                    cargo o comisión y que en su declaración de intereses
+                    manifestó tener algún tipo de participación con dicha
+                    empresa.</span
+                  >
                 </div>
+              </div>
             </div>
+
+            <div class="checkbox">
+              <label class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  class="checkbox-input"
+                  id="buyerProcuringFilter"
+                />
+                <span class="checkbox-tile">
+                  <span class="checkbox-icon">
+                    <i class="fa fa-exchange-alt fa-2x"></i>
+                  </span>
+                  <span class="checkbox-label"
+                    >Coincidencias entre la persona servidora pública
+                    contratante (Buyer) y el servidor público comprador
+                    (Procuring Entity).</span
+                  >
+                </span>
+              </label>
+              <div class="custom-tooltip">
+                <div class="custom-tooltip-title">Descripción:</div>
+                <div class="custom-tooltip-content">
+                  <strong class="tooltip-label"></strong>
+                  <span class="tooltip-description"
+                    >Muestra las coincidencias de los nombres de las personas
+                    servidoras públicas que poseen empresas, sociedades y
+                    asociaciones, que se les adjudicó un contrato, con los
+                    nombres de las personas servidoras públicas de la entidad
+                    contratante y el área requirente, de acuerdo con los datos
+                    registrados en el Sistema de información pública de
+                    contrataciones (Sistema 6) de la PDN.</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="checkbox">
+              <label class="checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  class="checkbox-input"
+                  id="highParticipationFilter"
+                />
+                <span class="checkbox-tile">
+                  <span class="checkbox-icon">
+                    <i class="fa fa-caret-up fa-4x"></i>
+                  </span>
+                  <span class="checkbox-label"
+                    >Empresas donde la persona servidora pública es socio o
+                    accionista controlador.</span
+                  >
+                </span>
+              </label>
+              <div class="custom-tooltip">
+                <div class="custom-tooltip-title">Descripción:</div>
+                <div class="custom-tooltip-content">
+                  <strong class="tooltip-label"></strong>
+                  <span class="tooltip-description"
+                    >Muestra cuando el sistema detectó que un servidor público
+                    tiene más del 50% de participación, es decir, es el socio o
+                    accionista controlador. Se entiende que un socio o
+                    accionista ejerce control sobre una sociedad cuando sean
+                    administradores o formen parte del consejo de
+                    administración, o bien conjunta o separadamente, directa o
+                    indirectamente, mantengan la titularidad de derechos que
+                    permitan ejercer el voto respecto de más del cincuenta por
+                    ciento del capital, tengan poder decisorio en sus asambleas,
+                    estén en posibilidades de nombrar a la mayoría de los
+                    miembros de su órgano de administración o por cualquier otro
+                    medio tengan facultades de tomar las decisiones
+                    fundamentales de dichas personas morales (art. 49, último
+                    párrafo de la Ley General de Responsabilidades
+                    Administrativas).</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div
+          class="col-md-6 col-xs-12 d-flex flex-column gap-2 align-items-stretch mx-auto"
+        >
+          <button
+            id="backButton"
+            type="button"
+            class="btn btn-primary btn-sm w-100"
+            style="display: block"
+          >
+            <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
+            <span>Regresar</span>
+          </button>
+          <button
+            id="clearFiltersBtn"
+            type="button"
+            class="btn btn-primary btn-sm w-100"
+            style="opacity: 1"
+          >
+            <i class="fa fa-trash me-2"></i>
+            <span>Quitar filtros</span>
+          </button>
+        </div>
+      </div>
+      <div class="row text-center">
+        <div class="col-12">
+          <div id="chart"></div>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div id="leyendaColores">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+            <div class="col">
+              <div class="d-flex align-items-center">
+                <span class="color-box bg-gray me-2"></span>
+                <small
+                  >Proceso de contratación con participación de servidor(es)
+                  público(s)</small
+                >
+              </div>
+            </div>
+            <div class="col contrato">
+              <div class="d-flex align-items-center">
+                <span class="color-box bg-yellow me-2"></span>
+                <small>Contrato adjudicado</small>
+              </div>
+            </div>
+            <div class="col">
+              <div class="d-flex align-items-justify">
+                <span class="color-box bg-orange me-2"></span>
+                <small
+                  >Proceso de contratación del Ente público que lleva
+                  a cabo la contratación y es el mismo en el que trabaja el
+                  servidor público.</small
+                >
+              </div>
+            </div>
+            <div class="col">
+              <div class="d-flex align-items-center">
+                <span class="color-box bg-red me-2"></span>
+                <small
+                  >Proceso de contratación con participación de servidor(es)
+                  público(s) y coincidencias en el Sistema 2 y 6</small
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="card" id="cardDetalleParticipaciones">
+            <div class="card-header">
+              Datos del (los) Servidor(es) Público(s) con Participación en las
+              Empresas, Sociedades y Asociaciones
+            </div>
+            <div class="card-body">
+              <div id="detalleParticipaciones" style="position: relative"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <script src="https://d3js.org/d3.v4.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"
-        integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"
+      integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script src="https://cdn.jsdelivr.net/npm/d3plus@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     <script src="src/treemap.js"></script>
-</body>
-
+  </body>
 </html>

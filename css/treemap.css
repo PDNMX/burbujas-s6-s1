@@ -87,6 +87,7 @@
 
 small {
     font-size: small !important;
+    text-align: justify;
 }
 
 
@@ -354,8 +355,8 @@ small {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 170px;
+  justify-content: space-between;
+  width: 200px;
   min-height: 180px;
   border-radius: 15px;
   border: 2px solid #f2f0f2;
@@ -400,6 +401,7 @@ small {
   transition: 0.375s ease;
   color: #5f5e6d;
   margin-bottom: 0.5rem;
+  flex: 0 0 auto;
 }
 
 .checkbox-label {
@@ -408,10 +410,257 @@ small {
   text-align: center;
   font-size: 0.9rem;
   line-height: 1.2;
+  margin-top: 0.5rem;
+  flex: 1 1 auto; 
+  display: flex;
+  align-items: flex-start; 
 }
 
 /* Hover states */
 .checkbox-tile:hover .checkbox-icon,
 .checkbox-tile:hover .checkbox-label {
   color: #bc798d;
+}
+
+
+
+/************* Estilos para el tooltip personalizado ****************/
+/* Estilos base del tooltip */
+.checkbox {
+  position: relative;
+}
+
+.checkbox:hover .custom-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-10px);
+}
+
+.custom-tooltip {
+  position: absolute;
+  bottom: 98%;
+  left: -98%;
+  transform: translateX(-50%);
+  padding: 12px;
+  background: #fbfbfb;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  width: max-content;
+  max-width: 600px;
+  z-index: 1000;
+  border: 1px solid #bc798d;
+}
+
+/* Título del tooltip */
+.custom-tooltip-title {
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  color: #94638d;
+  margin: 0;
+  margin-bottom: 10px;
+  text-align: left;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(148, 99, 141, 0.8);
+}
+
+/* Contenido del tooltip */
+.custom-tooltip-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tooltip-label {
+  color: #5f5e6d;
+  margin-right: 5px;
+}
+
+.tooltip-description {
+  color: #94638d;
+  flex: 1;
+}
+
+.custom-tooltip::before,
+.custom-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.custom-tooltip::before {
+  bottom: -9px; /* Ligeramente más abajo que el triángulo interior */
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid rgba(148, 99, 141, 0.8); /* Color del borde, usando el mismo del título */
+}
+
+.custom-tooltip::after {
+  bottom: -8px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white; /* Color interior del tooltip */
+}
+
+/* Estilos para asegurar que el texto fluya correctamente */
+.tooltip-label,
+.tooltip-description {
+  display: inline-block;
+  vertical-align: top;
+}
+
+/* Ajustes de espaciado y alineación */
+.custom-tooltip-content {
+  line-height: 1.4;
+}
+
+.tooltip-description {
+  text-align: justify;
+}
+
+
+
+/* TOOLTIP CON ICONO DE IFORMACIÓN */
+/* Contenedor del título */
+.title-container {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+/* Estilos del título principal */
+.heading-with-tooltip {
+  position: relative;
+  text-align: center;
+  color: #5f5e6d;
+  width: 100%;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+.heading-text {
+  border-bottom: 1px dotted #94638d;
+  padding-bottom: 2px;
+  cursor: help;
+}
+
+/* Ícono de información */
+.heading-info-icon {
+  color: #94638d;
+  margin-left: 8px;
+  font-size: 0.8em;
+  cursor: help;
+}
+
+/* Contenedor del tooltip */
+.heading-tooltip-container {
+  position: absolute;
+  left: 50%;
+  top: 80%;
+  transform: translateX(-50%) translateY(10px);
+  width: 80%;
+  max-width: 800px;
+  background: #fbfbfb;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  margin-top: 20px;
+  font-size: 13px;
+  border: 1px solid #bc798d;
+}
+
+/* Encabezado del tooltip */
+.heading-tooltip-header {
+  font-size: 14px;
+  font-weight: bold;
+  color: #94638d;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(148, 99, 141, 0.8);
+  text-align: left;
+}
+
+/* Contenido del tooltip */
+.heading-tooltip-body {
+  padding: 0 8px;
+}
+
+.heading-tooltip-label {
+  color: #5f5e6d;
+  display: block;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.heading-tooltip-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.heading-tooltip-list li {
+  color: #94638d;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  text-align: justify;
+  font-weight: normal;
+}
+
+/* Flecha del tooltip */
+.heading-tooltip-container::before,
+.heading-tooltip-container::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.heading-tooltip-container::before {
+  top: -9px;
+  border-bottom: 9px solid rgba(148, 99, 141, 0.8);
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+}
+
+.heading-tooltip-container::after {
+  top: -8px;
+  border-bottom: 8px solid white;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+}
+
+/* Mostrar tooltip al hover */
+.heading-with-tooltip:hover .heading-tooltip-container {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+
+.col.contrato {
+  padding-left: 100px;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .heading-tooltip-container {
+    width: 95%;
+  }
+  
+  .heading-with-tooltip {
+    font-size: 1.5rem;
+  }
+  
+  .heading-info-icon {
+    font-size: 0.7em;
+  }
 }
