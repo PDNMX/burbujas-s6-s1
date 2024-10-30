@@ -504,31 +504,31 @@ function renderTreemap(transformedData) {
       const supplierCheckbox = document.getElementById("supplierFilter");
       const sistema2Checkbox = document.getElementById("sistema2Filter");
       const entePublicoCheckbox = document.getElementById("entePublicoFilter");
-      const highParticipationCheckbox = document.getElementById(
-        "highParticipationFilter"
-      );
-
+      const buyerProcuringCheckbox = document.getElementById("buyerProcuringFilter");
+      const highParticipationCheckbox = document.getElementById("highParticipationFilter");
+    
       // Limpiar todos los filtros
       searchInput.value = "";
       supplierCheckbox.checked = false;
       sistema2Checkbox.checked = false;
       entePublicoCheckbox.checked = false;
+      buyerProcuringCheckbox.checked = false;
       highParticipationCheckbox.checked = false;
-
+    
       // Ocultar spinner de búsqueda si está visible
       const loadingSpinner = document.getElementById("loadingSpinner");
       if (loadingSpinner) {
         loadingSpinner.style.display = "none";
       }
-
+    
       // Restablecer estado global
       currentEmpresa = "";
-
+    
       // Aplicar los filtros
       if (typeof applyFilters === "function") {
         applyFilters();
       }
-
+    
       updateClearFiltersVisibility();
     }
 
@@ -537,37 +537,39 @@ function renderTreemap(transformedData) {
       const supplierCheckbox = document.getElementById("supplierFilter");
       const sistema2Checkbox = document.getElementById("sistema2Filter");
       const entePublicoCheckbox = document.getElementById("entePublicoFilter");
-      const highParticipationCheckbox = document.getElementById(
-        "highParticipationFilter"
-      );
-
+      const buyerProcuringCheckbox = document.getElementById("buyerProcuringFilter");
+      const highParticipationCheckbox = document.getElementById("highParticipationFilter");
+    
       const hasActiveFilters =
         searchInput.value !== "" ||
         supplierCheckbox.checked ||
         sistema2Checkbox.checked ||
-        entePublicoCheckbox.checked;
-      highParticipationCheckbox.checked;
-
+        entePublicoCheckbox.checked ||
+        buyerProcuringCheckbox.checked ||
+        highParticipationCheckbox.checked;
+    
       clearFiltersBtn.style.opacity = hasActiveFilters ? "1" : "0.5";
       clearFiltersBtn.disabled = !hasActiveFilters;
     }
 
-    // Agregar event listeners
     const inputs = [
-      document.getElementById("searchInput"),
-      document.getElementById("supplierFilter"),
-      document.getElementById("sistema2Filter"),
-      document.getElementById("entePublicoFilter"),
-    ];
+  document.getElementById("searchInput"),
+  document.getElementById("supplierFilter"), 
+  document.getElementById("sistema2Filter"),
+  document.getElementById("entePublicoFilter"),
+  document.getElementById("buyerProcuringFilter"),
+  document.getElementById("highParticipationFilter")
+];
 
-    inputs.forEach((input) => {
-      if (input) {
-        input.addEventListener(
-          input.type === "text" ? "input" : "change",
-          updateClearFiltersVisibility
-        );
-      }
-    });
+inputs.forEach((input) => {
+  if (input) {
+    input.addEventListener(
+      input.type === "text" ? "input" : "change",
+      updateClearFiltersVisibility
+    );
+  }
+});
+
 
     clearFiltersBtn.addEventListener("click", clearAllFilters);
     updateClearFiltersVisibility();
