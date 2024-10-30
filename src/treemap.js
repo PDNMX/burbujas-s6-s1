@@ -28,58 +28,60 @@ function normalizeText(text) {
 }
 
 // Función para transformar los datos
-// Función processData actualizada
 function processData(data) {
   return data.map((empresa) => ({
     ...empresa,
     empresa: empresa.nombreEmpresa,
     rfc: empresa.rfc,
     value: empresa.sistema6.length,
-    // Agregar el flag para participación alta
     hasHighParticipation: empresa.participaciones.some(
-      (participacion) => participacion.porcentajeParticipacion >= 50
+      participacion => participacion.porcentajeParticipacion >= 50
     ),
     children: empresa.sistema6.map((sistema6, sistemaIndex) => ({
       ...sistema6,
       id: sistemaIndex,
       tenderTitle: sistema6.tender.title,
       value: 1,
-      hasSistema2: empresa.participaciones.some(
-        (p) =>
-          p.sistema2 &&
-          p.sistema2.institucionDependencia &&
-          p.sistema2.institucionDependencia.nombre &&
-          sistema6.buyer &&
-          sistema6.buyer.name &&
-          p.sistema2.institucionDependencia.nombre.toLowerCase() ===
-            sistema6.buyer.name.toLowerCase()
+      hasSistema2: empresa.participaciones.some((p) =>
+        p.sistema2 &&
+        p.sistema2.institucionDependencia &&
+        p.sistema2.institucionDependencia.nombre &&
+        sistema6.buyer &&
+        sistema6.buyer.name &&
+        p.sistema2.institucionDependencia.nombre.toLowerCase() === sistema6.buyer.name.toLowerCase()
       ),
       hasEntePublicoMatch: empresa.participaciones.some(
         (p) =>
           p.nombreEntePublico &&
           sistema6.buyer &&
           sistema6.buyer.name &&
-          p.nombreEntePublico.toLowerCase() ===
-            sistema6.buyer.name.toLowerCase()
+          p.nombreEntePublico.toLowerCase() === sistema6.buyer.name.toLowerCase()
       ),
       isSupplier: sistema6.partiesMatch.isSupplier,
-      // Nueva validación simplificada para el objeto buyerAndProcuringEntities
-      hasBuyerProcuringMatch:
-        sistema6.buyerAndProcuringEntities &&
+      hasBuyerProcuringMatch: sistema6.buyerAndProcuringEntities &&
         sistema6.buyerAndProcuringEntities.buyer &&
         sistema6.buyerAndProcuringEntities.buyer.name &&
         sistema6.buyerAndProcuringEntities.procuringEntity &&
         sistema6.buyerAndProcuringEntities.procuringEntity.name &&
         sistema6.buyerAndProcuringEntities.buyer.name.toLowerCase() ===
-          sistema6.buyerAndProcuringEntities.procuringEntity.name.toLowerCase() &&
+        sistema6.buyerAndProcuringEntities.procuringEntity.name.toLowerCase() &&
         sistema6.buyer &&
         sistema6.buyer.name &&
         empresa.participaciones.some(
-          (p) =>
-            p.nombreEntePublico &&
-            p.nombreEntePublico.toLowerCase() ===
-              sistema6.buyer.name.toLowerCase()
-        ),
+          (p) => {
+            // Construir nombreCompleto de la participación
+            const nombreCompleto = `${p.nombre || ''} ${p.primerApellido || ''} ${p.segundoApellido || ''}`.trim().toLowerCase();
+            // Verificar coincidencia con nombreEntePublico
+            const matchesEntePublico = p.nombreEntePublico &&
+              p.nombreEntePublico.toLowerCase() === sistema6.buyer.name.toLowerCase();
+            // Verificar coincidencia con nombreCompleto para buyer y procuringEntity
+            const matchesNombreCompleto = nombreCompleto &&
+              (sistema6.buyerAndProcuringEntities.buyer.name.toLowerCase().includes(nombreCompleto) ||
+               sistema6.buyerAndProcuringEntities.procuringEntity.name.toLowerCase().includes(nombreCompleto));
+            
+            return matchesEntePublico && matchesNombreCompleto;
+          }
+        )
     })),
   }));
 }
