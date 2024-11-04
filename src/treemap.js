@@ -17,6 +17,108 @@ const childColors = {
   withSistema2: 'hsl(347, 48%, 49%)',
 };
 
+// Función principal para manejar la exportación
+async function handleExportAll() {
+  const exportAllBtn = document.getElementById('exportAllButton');
+  if (!exportAllBtn) return;
+
+  const progressBar = createProgressBar();
+  const worker = createWorker();
+
+  try {
+    exportAllBtn.disabled = true;
+    const originalHTML = exportAllBtn.innerHTML;
+    exportAllBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Procesando...';
+
+    worker.onmessage = function(e) {
+      if (e.data.type === 'progress') {
+        updateProgressBar(progressBar, e.data.progress);
+      } else if (e.data.type === 'complete') {
+        downloadZipFile(e.data.data);
+        resetExportButton(exportAllBtn, originalHTML);
+        removeProgressBar(progressBar);
+        worker.terminate(); // Limpiar el worker
+      }
+    };
+
+    worker.onerror = function(error) {
+      console.error('Worker error:', error);
+      alert('Hubo un error al procesar los archivos.');
+      resetExportButton(exportAllBtn, originalHTML);
+      removeProgressBar(progressBar);
+      worker.terminate();
+    };
+
+    // Iniciar el procesamiento
+    worker.postMessage({
+      empresas: allData,
+      batchSize: 5
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Hubo un error al iniciar la exportación.');
+    resetExportButton(exportAllBtn, originalHTML);
+    removeProgressBar(progressBar);
+    if (worker) worker.terminate();
+  }
+}
+
+// Funciones auxiliares
+function createProgressBar() {
+  const container = document.createElement('div');
+  container.className = 'progress mt-2';
+  container.style.height = '5px';
+
+  const progressBar = document.createElement('div');
+  progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
+  progressBar.style.width = '0%';
+
+  container.appendChild(progressBar);
+
+  // Insertar después del botón exportAllButton
+  const exportAllBtn = document.getElementById('exportAllButton');
+  exportAllBtn.parentNode.insertBefore(container, exportAllBtn.nextSibling);
+
+  return container;
+}
+
+function updateProgressBar(container, progress) {
+  const progressBar = container.querySelector('.progress-bar');
+  progressBar.style.width = `${progress}%`;
+}
+
+function removeProgressBar(container) {
+  if (container && container.parentNode) {
+    container.parentNode.removeChild(container);
+  }
+}
+
+function resetExportButton(button, originalHTML) {
+  button.disabled = false;
+  button.innerHTML = originalHTML;
+}
+
+function downloadZipFile(zipContent) {
+  const blob = new Blob([zipContent], { type: 'application/zip' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `PDN_Treemap_Empresas_${new Date().toISOString().split('T')[0]}.zip`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Agregar el evento al botón cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+  const exportAllBtn = document.getElementById('exportAllButton');
+  if (exportAllBtn) {
+    exportAllBtn.addEventListener('click', handleExportAll);
+  }
+});
+
 // Función auxiliar para normalizar texto (eliminar acentos)
 function normalizeText(text) {
   return text

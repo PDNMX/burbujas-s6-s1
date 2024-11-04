@@ -678,3 +678,21 @@ small {
 #exportButton.loading i {
   animation: fa-spin 2s infinite linear;
 }
+
+.progress {
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 0;
+}
+
+.progress-bar {
+  background-color: #28a745;
+}
+
+#exportAllButton {
+  transition: all 0.3s ease;
+}
+
+#exportAllButton:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
