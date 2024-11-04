@@ -101,7 +101,7 @@ small {
     position: relative;
     border-radius: 25px;
   }
-  
+
   /* Estilos base del input */
   .input-group .form-control {
     border: 1px solid #94638d;
@@ -110,7 +110,7 @@ small {
     color: #bc798d;
     padding: 0.5rem 3rem 0.5rem 1rem;
   }
-  
+
   /* Remover estilos del input group text */
   .input-group-text {
     position: absolute;
@@ -124,17 +124,17 @@ small {
     align-items: center;
     padding: 0 1rem;
   }
-  
+
   /* Control de visibilidad del spinner */
   .loading {
     display: none;
   }
-  
+
   /* Color del ícono */
   .input-group-text i {
     color: #94638d;
   }
-  
+
   /* Estados focus del input */
   .input-group .form-control:focus {
     border-width: 2px;
@@ -143,12 +143,12 @@ small {
     box-shadow: none;
     background-color: white !important;
   }
-  
+
   /* Estado hover del input con halo más ancho */
   .input-group .form-control:hover {
     box-shadow: 0 0 0 4px rgba(148, 99, 141, 0.25);
   }
-  
+
   /* Para asegurar que el fondo blanco tenga prioridad en focus */
   .input-group .form-control:focus,
   .form-control:focus {
@@ -340,14 +340,14 @@ small {
   border-color: #94638d;
 }
 
-.checkbox-input:checked + .checkbox-tile .checkbox-icon, 
+.checkbox-input:checked + .checkbox-tile .checkbox-icon,
 .checkbox-input:checked + .checkbox-tile .checkbox-label {
   color: #94638d;
 }
 
 .checkbox-input:focus + .checkbox-tile {
   border-color: #94638d;
-  box-shadow: 0 5px 10px rgba(148, 99, 141, 0.2), 
+  box-shadow: 0 5px 10px rgba(148, 99, 141, 0.2),
               0 0 0 4px rgba(148, 99, 141, 0.25);
 }
 
@@ -411,9 +411,9 @@ small {
   font-size: 0.9rem;
   line-height: 1.2;
   margin-top: 0.5rem;
-  flex: 1 1 auto; 
+  flex: 1 1 auto;
   display: flex;
-  align-items: flex-start; 
+  align-items: flex-start;
 }
 
 /* Hover states */
@@ -655,12 +655,31 @@ small {
   .heading-tooltip-container {
     width: 95%;
   }
-  
+
   .heading-with-tooltip {
     font-size: 1.5rem;
   }
-  
+
   .heading-info-icon {
     font-size: 0.7em;
   }
+}
+
+#exportButton {
+  transition: all 0.3s ease;
+}
+
+#exportButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Animación de carga durante la exportación */
+#exportButton.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+#exportButton.loading i {
+  animation: fa-spin 2s infinite linear;
 }
