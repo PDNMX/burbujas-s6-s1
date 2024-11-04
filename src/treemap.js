@@ -62,7 +62,7 @@ function exportToExcel(empresa) {
     'Tipo de Participación': p.tipoParticipacion || 'No disponible',
     'Sector de Participación': p.sectorParticipacion || 'No disponible',
     // Información del Sistema 2 si existe
-    'S2 - Nombres': p.sistema2?.nombres || 'No disponible',
+    /* 'S2 - Nombres': p.sistema2?.nombres || 'No disponible',
     'S2 - Primer Apellido': p.sistema2?.primerApellido || 'No disponible',
     'S2 - Segundo Apellido': p.sistema2?.segundoApellido || 'No disponible',
     'S2 - Institución': p.sistema2?.institucionDependencia?.nombre || 'No disponible',
@@ -70,7 +70,7 @@ function exportToExcel(empresa) {
     'S2 - Nivel': p.sistema2?.puesto?.nivel || 'No disponible',
     'S2 - Nivel de Responsabilidad':
       p.sistema2?.nivelResponsabilidad?.map(nr => nr.valor).join(', ') || 'No disponible',
-    'S2 - Tipo de Procedimiento': p.sistema2?.tipoProcedimiento?.map(tp => tp.valor).join(', ') || 'No disponible',
+    'S2 - Tipo de Procedimiento': p.sistema2?.tipoProcedimiento?.map(tp => tp.valor).join(', ') || 'No disponible', */
   }));
 
   // Asegurarnos que children sea un arreglo
@@ -123,7 +123,7 @@ function exportToExcel(empresa) {
   }
 
   // Generar el archivo y descargarlo
-  const fileName = `${empresa.nombreEmpresa || 'Empresa'}_${empresa.rfc || 'RFC'}_${
+  const fileName = `PDN_${empresa.nombreEmpresa || 'Empresa'}_${empresa.rfc || 'RFC'}_${
     new Date().toISOString().split('T')[0]
   }.xlsx`;
   XLSX.writeFile(wb, fileName);
