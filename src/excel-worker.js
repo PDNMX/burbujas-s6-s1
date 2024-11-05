@@ -84,12 +84,12 @@ function createWorker() {
         }));
 
         const contratacionesData = (empresa.children || []).map(child => ({
-          'Título de Licitación': child.tender?.title || 'No disponible',
-          'Fecha Inicio': child.tender?.tenderPeriod?.startDate || 'No disponible',
-          'Fecha Término': child.tender?.awardPeriod?.endDate || 'No disponible',
+          'Título del proceso de contratación': child.tender?.title || 'No disponible',
+          'Fecha de inicio de recepción de ofertas': child.tender?.tenderPeriod?.startDate || 'No disponible',
+          '>Fecha de adjudicación': child.tender?.awardPeriod?.endDate || 'No disponible',
           'Método de Contratación': child.tender?.procurementMethod || 'No disponible',
-          'Comprador': child.buyer?.name || 'No disponible',
-          'Estatus': child.tender?.status || 'No disponible',
+          'Entidad contratante': child.buyer?.name || 'No disponible',
+          'Estatus del proceso de contratación': child.tender?.status || 'No disponible',
           'Es Proveedor': child.partiesMatch?.isSupplier ? 'Sí' : 'No',
           'Coincidencia Ente Público': child.hasEntePublicoMatch ? 'Sí' : 'No',
           'Coincidencia Sistema 2': child.hasSistema2 ? 'Sí' : 'No',
@@ -97,9 +97,6 @@ function createWorker() {
           'Procuring Entity': child.buyerAndProcuringEntities?.procuringEntity?.name || 'No disponible',
           'Monto Adjudicado': child.awards?.[0]?.value?.amount || 'No disponible',
           'Moneda': child.awards?.[0]?.value?.currency || 'No disponible',
-          'Estatus Award': child.awards?.[0]?.status || 'No disponible',
-          'Proveedor ID': child.awards?.[0]?.suppliers?.[0]?.id || 'No disponible',
-          'Proveedor Nombre': child.awards?.[0]?.suppliers?.[0]?.name || 'No disponible'
         }));
 
         // Crear el workbook
